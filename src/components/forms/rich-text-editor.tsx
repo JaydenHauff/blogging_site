@@ -7,15 +7,23 @@ import { Editor } from '@tinymce/tinymce-react';
 interface RichTextEditorProps {
   initialValue?: string;
   onEditorChange: (content: string) => void;
-  apiKey?: string; // Optional: for production use
 }
 
-const RichTextEditor: React.FC<RichTextEditorProps> = ({ initialValue, onEditorChange, apiKey }) => {
+const RichTextEditor: React.FC<RichTextEditorProps> = ({ initialValue, onEditorChange }) => {
   const editorRef = React.useRef<any>(null);
+  // IMPORTANT: Replace 'YOUR_TINYMCE_API_KEY_HERE' with your actual TinyMCE API key
+  const apiKey = process.env.NEXT_PUBLIC_TINYMCE_API_KEY || 'YOUR_TINYMCE_API_KEY_HERE';
+
+  if (apiKey === 'YOUR_TINYMCE_API_KEY_HERE' && process.env.NODE_ENV === 'production') {
+    console.warn(
+      'TinyMCE API key is not configured. Please set NEXT_PUBLIC_TINYMCE_API_KEY environment variable or update RichTextEditor.tsx for production use.'
+    );
+  }
+
 
   return (
     <Editor
-      apiKey={apiKey || 'no-api-key'} // Replace 'no-api-key' with your actual API key in production
+      apiKey={apiKey}
       onInit={(evt, editor) => editorRef.current = editor}
       initialValue={initialValue || ''}
       init={{
