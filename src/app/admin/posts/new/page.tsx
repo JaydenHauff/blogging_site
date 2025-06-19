@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import { createBlogPostAction } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import SectionTitle from '@/components/ui/section-title';
 import TranslucentContainer from '@/components/ui/translucent-container';
@@ -15,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Terminal, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
+import RichTextEditor from '@/components/forms/rich-text-editor'; // Import the new editor
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -34,6 +34,7 @@ export default function CreatePostPage() {
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [imageDataUri, setImageDataUri] = useState<string | null>(null);
   const [imageUrlInput, setImageUrlInput] = useState<string>('');
+  const [editorContent, setEditorContent] = useState<string>('');
 
   useEffect(() => {
     if (state.message) {
@@ -47,6 +48,7 @@ export default function CreatePostPage() {
         setImagePreviewUrl(null);
         setImageDataUri(null);
         setImageUrlInput('');
+        setEditorContent(''); // Reset editor content
         if (state.newPostSlug) {
           router.push('/admin/dashboard'); 
         }
@@ -62,7 +64,7 @@ export default function CreatePostPage() {
         const dataUri = reader.result as string;
         setImagePreviewUrl(dataUri);
         setImageDataUri(dataUri);
-        setImageUrlInput(''); // Clear URL input if file is chosen
+        setImageUrlInput(''); 
       };
       reader.readAsDataURL(file);
     } else {
@@ -76,18 +78,17 @@ export default function CreatePostPage() {
     setImageUrlInput(url);
     if (url) {
       setImagePreviewUrl(url);
-      setImageDataUri(null); // Clear file data if URL is typed
-      // Clear the file input visually, if possible and desired.
-      // This is tricky as file input value is read-only for security.
-      // For now, logic ensures dataUri is cleared.
+      setImageDataUri(null); 
       const fileInput = document.getElementById('imageFile') as HTMLInputElement;
       if (fileInput) fileInput.value = '';
-
-    } else if (!imageDataUri) { // if URL is cleared and no file was selected
+    } else if (!imageDataUri) { 
       setImagePreviewUrl(null);
     }
   };
 
+  const handleEditorChange = (content: string) => {
+    setEditorContent(content);
+  };
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
@@ -98,12 +99,14 @@ export default function CreatePostPage() {
         <AlertTitle>Admin Area</AlertTitle>
         <AlertDescription>
           Ensure this page and all admin functionalities are protected by authentication and authorization in a production environment.
+          Note: The TinyMCE editor might show a 'This domain is not registered...' message. For production, get a free API key from TinyMCE.
         </AlertDescription>
       </Alert>
 
       <TranslucentContainer baseColor="card" backgroundOpacity={80} padding="p-6 md:p-8">
         <form ref={formRef} action={formAction} className="space-y-6">
           <input type="hidden" name="imageDataUri" value={imageDataUri || ''} />
+          <input type="hidden" name="content" value={editorContent} /> {/* Hidden input for editor content */}
 
           <div>
             <Label htmlFor="title">Title</Label>
@@ -138,23 +141,22 @@ export default function CreatePostPage() {
 
           <div>
             <Label htmlFor="excerpt">Excerpt (Short Summary)</Label>
-            <Textarea id="excerpt" name="excerpt" placeholder="A brief summary of the post..." rows={3} required className="mt-1"/>
+            <Input id="excerpt" name="excerpt" placeholder="A brief summary of the post..." required className="mt-1"/> {/* Changed to Input for brevity */}
             {state.errors?.excerpt && <p className="text-sm text-red-500 mt-1">{state.errors.excerpt[0]}</p>}
           </div>
           
-          {/* Image Upload and URL Input */}
           <div className="space-y-2">
-            <Label htmlFor="imageFile">Upload Image (from local storage)</Label>
+            <Label htmlFor="imageFile">Featured Image (Upload)</Label>
             <Input id="imageFile" name="imageFile" type="file" accept="image/*" onChange={handleImageFileChange} className="mt-1"/>
             <p className="text-xs text-muted-foreground mt-1">Or</p>
-            <Label htmlFor="imageUrl">Image URL (paste direct link)</Label>
+            <Label htmlFor="imageUrl">Featured Image URL (Paste Link)</Label>
             <Input id="imageUrl" name="imageUrl" type="url" placeholder="https://placehold.co/600x400.png" value={imageUrlInput} onChange={handleImageUrlChange} className="mt-1"/>
             {state.errors?.imageUrl && <p className="text-sm text-red-500 mt-1">{state.errors.imageUrl[0]}</p>}
           </div>
 
           {imagePreviewUrl && (
             <div className="mt-4 p-4 border rounded-md bg-muted/30">
-              <Label>Image Preview:</Label>
+              <Label>Featured Image Preview:</Label>
               <div className="relative w-full h-64 mt-2 rounded-md overflow-hidden border">
                 <Image src={imagePreviewUrl} alt="Selected image preview" layout="fill" objectFit="contain" />
               </div>
@@ -162,25 +164,19 @@ export default function CreatePostPage() {
           )}
           
            <div>
-            <Label htmlFor="imageHint">Image AI Hint (Optional, 1-2 words for placeholder)</Label>
+            <Label htmlFor="imageHint">Featured Image AI Hint (Optional, 1-2 words for placeholder)</Label>
             <Input id="imageHint" name="imageHint" placeholder="e.g., abstract tech" className="mt-1"/>
              {state.errors?.imageHint && <p className="text-sm text-red-500 mt-1">{state.errors.imageHint[0]}</p>}
           </div>
 
           <div>
-            <Label htmlFor="content">Content</Label>
-            <Textarea 
-              id="content" 
-              name="content" 
-              placeholder="Write your blog post content here..." 
-              rows={15} 
-              required 
-              className="mt-1"
-            />
-            <p className="text-xs text-muted-foreground mt-1">
-              For styling like bold, italics, or headers, you can use HTML tags directly (e.g., `&lt;strong&gt;bold&lt;/strong&gt;`, `&lt;em&gt;italics&lt;/em&gt;`, `&lt;h1&gt;Header&lt;/h1&gt;`).
-              A rich text editor with toolbar buttons is a planned future enhancement.
-            </p>
+            <Label htmlFor="contentEditor">Content</Label>
+            <div className="mt-1">
+              <RichTextEditor
+                initialValue={editorContent}
+                onEditorChange={handleEditorChange}
+              />
+            </div>
             {state.errors?.content && <p className="text-sm text-red-500 mt-1">{state.errors.content[0]}</p>}
           </div>
 
@@ -192,4 +188,3 @@ export default function CreatePostPage() {
     </div>
   );
 }
-
