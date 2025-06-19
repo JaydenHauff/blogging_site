@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -6,7 +5,6 @@ import dynamic from 'next/dynamic';
 import 'react-quill/dist/quill.snow.css'; // Import Quill styles
 
 // Dynamically import ReactQuill to ensure it's only loaded on the client-side
-// This should be at the module level, not inside useMemo within the component
 const ReactQuill = dynamic(() => import('react-quill'), { 
   ssr: false,
   loading: () => <div style={{ minHeight: '250px', border: '1px solid hsl(var(--border))', borderRadius: '0.375rem', padding: '10px', color: 'hsl(var(--muted-foreground))' }}>Loading editor...</div>
@@ -18,8 +16,6 @@ interface RichTextEditorProps {
 }
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange }) => {
-  // The isMounted check might no longer be strictly necessary if dynamic() handles loading state,
-  // but keeping it doesn't hurt and ensures we don't try to render before client is ready.
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -68,8 +64,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange }
       onChange={onEditorChange}
       modules={modules}
       formats={formats}
-      style={{ backgroundColor: 'hsl(var(--card))' }} 
-      className="quill-editor-container" 
+      // Removed style and className props from ReactQuill component itself
     />
   );
 };
