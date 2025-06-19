@@ -99,7 +99,7 @@ export default function CreatePostPage() {
         <AlertTitle>Admin Area</AlertTitle>
         <AlertDescription>
           Ensure this page and all admin functionalities are protected by authentication and authorization in a production environment.
-          Note: The TinyMCE editor might show a 'This domain is not registered...' message. For production, get a free API key from TinyMCE.
+          Note: The TinyMCE editor might show a 'This domain is not registered...' message. For production, get a free API key from TinyMCE and ensure your domain (e.g., localhost) is registered with your API key.
         </AlertDescription>
       </Alert>
 
@@ -173,7 +173,7 @@ export default function CreatePostPage() {
             <Label htmlFor="contentEditor">Content</Label>
             <div className="mt-1">
               <RichTextEditor
-                initialValue={editorContent}
+                value={editorContent} // Changed from initialValue
                 onEditorChange={handleEditorChange}
               />
             </div>

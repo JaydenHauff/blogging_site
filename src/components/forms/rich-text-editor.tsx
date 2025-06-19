@@ -5,27 +5,21 @@ import React from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 
 interface RichTextEditorProps {
-  initialValue?: string;
+  value?: string; // Changed from initialValue
   onEditorChange: (content: string) => void;
 }
 
-const RichTextEditor: React.FC<RichTextEditorProps> = ({ initialValue, onEditorChange }) => {
+const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange }) => {
   const editorRef = React.useRef<any>(null);
   // Using the API key directly as requested.
   const apiKey = "apf4vetipf1mll3j1pksv3ennu1wfld2ehi4qv9e8zwztj6f";
-
-  if (apiKey === 'YOUR_TINYMCE_API_KEY_HERE' && process.env.NODE_ENV === 'production') {
-    console.warn(
-      'TinyMCE API key is not configured. Please set NEXT_PUBLIC_TINYMCE_API_KEY environment variable or update RichTextEditor.tsx for production use.'
-    );
-  }
-
 
   return (
     <Editor
       apiKey={apiKey}
       onInit={(evt, editor) => editorRef.current = editor}
-      initialValue={initialValue || ''}
+      value={value || ''} // Changed from initialValue
+      disabled={false} // Explicitly set to ensure it's not disabled
       init={{
         height: 500,
         menubar: true,
