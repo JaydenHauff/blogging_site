@@ -11,8 +11,8 @@ interface RichTextEditorProps {
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({ initialValue, onEditorChange }) => {
   const editorRef = React.useRef<any>(null);
-  // IMPORTANT: Replace 'YOUR_TINYMCE_API_KEY_HERE' with your actual TinyMCE API key
-  const apiKey = process.env.NEXT_PUBLIC_TINYMCE_API_KEY || 'YOUR_TINYMCE_API_KEY_HERE';
+  // Using the API key directly as requested.
+  const apiKey = "apf4vetipf1mll3j1pksv3ennu1wfld2ehi4qv9e8zwztj6f";
 
   if (apiKey === 'YOUR_TINYMCE_API_KEY_HERE' && process.env.NODE_ENV === 'production') {
     console.warn(
