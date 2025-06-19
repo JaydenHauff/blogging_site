@@ -14,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Terminal, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
-import RichTextEditor from '@/components/forms/rich-text-editor'; // Import the new editor
+import RichTextEditor from '@/components/forms/rich-text-editor';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -48,7 +48,7 @@ export default function CreatePostPage() {
         setImagePreviewUrl(null);
         setImageDataUri(null);
         setImageUrlInput('');
-        setEditorContent(''); // Reset editor content
+        setEditorContent('');
         if (state.newPostSlug) {
           router.push('/admin/dashboard'); 
         }
@@ -96,17 +96,17 @@ export default function CreatePostPage() {
       
       <Alert className="mb-8 bg-secondary/50">
         <Terminal className="h-4 w-4" />
-        <AlertTitle>Admin Area</AlertTitle>
+        <AlertTitle>Admin Area & Editor Notes</AlertTitle>
         <AlertDescription>
-          Ensure this page and all admin functionalities are protected by authentication and authorization in a production environment.
-          Note: The TinyMCE editor might show a 'This domain is not registered...' message. For production, get a free API key from TinyMCE and ensure your domain (e.g., localhost) is registered with your API key.
+          Ensure this page and all admin functionalities are protected by authentication in production.
+          The TinyMCE editor uses an API key. If it appears read-only or shows a 'This domain is not registered...' notice, please ensure your current domain (e.g., localhost or your specific development URL) is correctly registered in your TinyMCE account settings for the provided API key.
         </AlertDescription>
       </Alert>
 
       <TranslucentContainer baseColor="card" backgroundOpacity={80} padding="p-6 md:p-8">
         <form ref={formRef} action={formAction} className="space-y-6">
           <input type="hidden" name="imageDataUri" value={imageDataUri || ''} />
-          <input type="hidden" name="content" value={editorContent} /> {/* Hidden input for editor content */}
+          <input type="hidden" name="content" value={editorContent} />
 
           <div>
             <Label htmlFor="title">Title</Label>
@@ -141,7 +141,7 @@ export default function CreatePostPage() {
 
           <div>
             <Label htmlFor="excerpt">Excerpt (Short Summary)</Label>
-            <Input id="excerpt" name="excerpt" placeholder="A brief summary of the post..." required className="mt-1"/> {/* Changed to Input for brevity */}
+            <Input id="excerpt" name="excerpt" placeholder="A brief summary of the post..." required className="mt-1"/>
             {state.errors?.excerpt && <p className="text-sm text-red-500 mt-1">{state.errors.excerpt[0]}</p>}
           </div>
           
@@ -173,7 +173,7 @@ export default function CreatePostPage() {
             <Label htmlFor="contentEditor">Content</Label>
             <div className="mt-1">
               <RichTextEditor
-                value={editorContent} // Changed from initialValue
+                value={editorContent}
                 onEditorChange={handleEditorChange}
               />
             </div>

@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react'; // Added useState, useEffect
+import React, { useState, useEffect, useRef } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 
 interface RichTextEditorProps {
@@ -12,14 +12,14 @@ interface RichTextEditorProps {
 const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange }) => {
   const editorRef = useRef<any>(null);
   const apiKey = "apf4vetipf1mll3j1pksv3ennu1wfld2ehi4qv9e8zwztj6f";
-  const [isMounted, setIsMounted] = useState(false); // State to track client-side mount
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true); // Set to true after component mounts on client
+    setIsMounted(true);
   }, []);
 
   if (!isMounted) {
-    // Render null or a placeholder on the server and during initial client hydration
+    // Render a placeholder on the server and during initial client hydration
     return <div style={{ minHeight: '500px', border: '1px solid #ccc', borderRadius: '4px', padding: '10px', color: '#888' }}>Loading editor...</div>;
   }
 
@@ -28,7 +28,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange }
       apiKey={apiKey}
       onInit={(evt, editor) => editorRef.current = editor}
       value={value || ''}
-      disabled={false}
       init={{
         height: 500,
         menubar: true,
