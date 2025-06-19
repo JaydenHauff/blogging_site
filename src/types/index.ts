@@ -1,8 +1,9 @@
+
 export interface BlogPost {
   id: string;
   slug: string;
   title: string;
-  date: string;
+  date: string; // ISO string format
   author: string;
   imageUrl?: string;
   imageHint?: string;
