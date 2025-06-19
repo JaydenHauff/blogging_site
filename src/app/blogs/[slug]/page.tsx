@@ -1,12 +1,14 @@
+
 import { MOCK_BLOG_POSTS } from '@/lib/constants';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import SocialShareButtons from '@/components/blog/social-share-buttons';
 import TranslucentContainer from '@/components/ui/translucent-container';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button'; // Added import
 import { CalendarDays, UserCircle, Tag, Edit3 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-import Link from 'next/link'; // Added for "Edit Post" button
+import Link from 'next/link';
 
 interface BlogPostPageProps {
   params: { slug: string };
