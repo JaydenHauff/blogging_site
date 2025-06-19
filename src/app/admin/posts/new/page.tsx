@@ -102,9 +102,15 @@ export default function CreatePostPage() {
           The TinyMCE editor uses an API key. <strong>If the editor appears read-only or shows a 'This domain is not registered...' notice:</strong>
           <ul className="list-disc pl-5 mt-2">
             <li>Log in to your TinyMCE account.</li>
-            <li>Go to your API key settings.</li>
-            <li>Ensure your current development domain (e.g., <code>localhost</code>, <code>localhost:port</code>, or the cloud development URL like <code>*.cloudworkstations.dev</code>) is added to the list of "Approved Domains" for the API key being used.</li>
-            <li>The API key currently in use is: <code>apf4vetipf1mll3j1pksv3ennu1wfld2ehi4qv9e8zwztj6f</code>.</li>
+            <li>Go to your API key settings (the key currently in use is: <code>apf4vetipf1mll3j1pksv3ennu1wfld2ehi4qv9e8zwztj6f</code>).</li>
+            <li>Add your <strong>current development domain</strong> to the list of "Approved Domains". This is the domain shown in your browser's address bar.
+                Examples:
+                <ul className="list-disc pl-5 mt-1">
+                    <li>If you are running locally: <code>localhost</code> (you may also need to add <code>localhost:your_port_number</code> like <code>localhost:9002</code>).</li>
+                    <li>If you are using a cloud development environment: <code>your-project-name.cloudworkstations.dev</code> (or a wildcard like <code>*.cloudworkstations.dev</code> if TinyMCE supports it).</li>
+                </ul>
+            </li>
+            <li>Save the changes in your TinyMCE dashboard and refresh this page.</li>
           </ul>
         </AlertDescription>
       </Alert>
@@ -194,4 +200,3 @@ export default function CreatePostPage() {
     </div>
   );
 }
-
