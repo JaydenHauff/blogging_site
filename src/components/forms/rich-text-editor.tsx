@@ -5,16 +5,22 @@ import React, { useState, useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import 'react-quill/dist/quill.snow.css'; // Import Quill styles
 
+// Dynamically import ReactQuill to ensure it's only loaded on the client-side
+// This should be at the module level, not inside useMemo within the component
+const ReactQuill = dynamic(() => import('react-quill'), { 
+  ssr: false,
+  loading: () => <div style={{ minHeight: '250px', border: '1px solid hsl(var(--border))', borderRadius: '0.375rem', padding: '10px', color: 'hsl(var(--muted-foreground))' }}>Loading editor...</div>
+});
+
 interface RichTextEditorProps {
   value?: string;
   onEditorChange: (content: string) => void;
 }
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange }) => {
+  // The isMounted check might no longer be strictly necessary if dynamic() handles loading state,
+  // but keeping it doesn't hurt and ensures we don't try to render before client is ready.
   const [isMounted, setIsMounted] = useState(false);
-
-  // Dynamically import ReactQuill to ensure it's only loaded on the client-side
-  const ReactQuill = useMemo(() => dynamic(() => import('react-quill'), { ssr: false }),[]);
 
   useEffect(() => {
     setIsMounted(true);
@@ -49,9 +55,10 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange }
     'color', 'background', 'font', 'align', 'script', 'direction'
   ], []);
 
-  if (!isMounted || !ReactQuill) {
-    // Render a placeholder on the server and during initial client hydration
-    return <div style={{ minHeight: '250px', border: '1px solid hsl(var(--border))', borderRadius: '0.375rem', padding: '10px', color: 'hsl(var(--muted-foreground))' }}>Loading editor...</div>;
+  if (!isMounted) {
+    // This will be shown by dynamic import's loading prop if ssr:false,
+    // but can be a fallback or if dynamic loading itself takes time.
+    return <div style={{ minHeight: '250px', border: '1px solid hsl(var(--border))', borderRadius: '0.375rem', padding: '10px', color: 'hsl(var(--muted-foreground))' }}>Preparing editor...</div>;
   }
 
   return (
@@ -61,11 +68,10 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange }
       onChange={onEditorChange}
       modules={modules}
       formats={formats}
-      style={{ backgroundColor: 'hsl(var(--card))' }} // Ensure editor area is visible and uses card background
-      className="quill-editor-container" // Custom class for specific targeting if needed
+      style={{ backgroundColor: 'hsl(var(--card))' }} 
+      className="quill-editor-container" 
     />
   );
 };
 
 export default RichTextEditor;
-
