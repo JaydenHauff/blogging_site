@@ -50,7 +50,7 @@ export default function CreatePostPage() {
         setImageUrlInput('');
         setEditorContent('');
         if (state.newPostSlug) {
-          router.push('/admin/dashboard'); 
+          router.push('/admin/dashboard');
         }
       }
     }
@@ -64,7 +64,7 @@ export default function CreatePostPage() {
         const dataUri = reader.result as string;
         setImagePreviewUrl(dataUri);
         setImageDataUri(dataUri);
-        setImageUrlInput(''); 
+        setImageUrlInput('');
       };
       reader.readAsDataURL(file);
     } else {
@@ -78,10 +78,10 @@ export default function CreatePostPage() {
     setImageUrlInput(url);
     if (url) {
       setImagePreviewUrl(url);
-      setImageDataUri(null); 
+      setImageDataUri(null);
       const fileInput = document.getElementById('imageFile') as HTMLInputElement;
       if (fileInput) fileInput.value = '';
-    } else if (!imageDataUri) { 
+    } else if (!imageDataUri) {
       setImagePreviewUrl(null);
     }
   };
@@ -93,24 +93,28 @@ export default function CreatePostPage() {
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
       <SectionTitle title="Create New Blog Post" subtitle="Craft your next masterpiece for MuseBlog." alignment="left" />
-      
+
       <Alert className="mb-8 bg-secondary/50">
         <Terminal className="h-4 w-4" />
-        <AlertTitle>Admin Area & Editor Notes</AlertTitle>
+        <AlertTitle>Admin Area & TinyMCE Editor Configuration</AlertTitle>
         <AlertDescription>
           Ensure this page and all admin functionalities are protected by authentication in production.
-          The TinyMCE editor uses an API key. <strong>If the editor appears read-only or shows a 'This domain is not registered...' notice:</strong>
+          <br />
+          The TinyMCE editor uses an API key. <strong>If the editor is read-only (you cannot type in it), or if it displays a 'This domain is not registered...' notice:</strong>
+          This almost always means your current development domain needs to be added to your TinyMCE account's "Approved Domains" list for the API key.
           <ul className="list-disc pl-5 mt-2">
-            <li>Log in to your TinyMCE account.</li>
-            <li>Go to your API key settings (the key currently in use is: <code>apf4vetipf1mll3j1pksv3ennu1wfld2ehi4qv9e8zwztj6f</code>).</li>
-            <li>Add your <strong>current development domain</strong> to the list of "Approved Domains". This is the domain shown in your browser's address bar.
+            <li>Log in to your <a href="https://www.tiny.cloud/my-account/dashboard/" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">TinyMCE account dashboard</a>.</li>
+            <li>Navigate to your API key settings (the key currently in use is: <code>apf4vetipf1mll3j1pksv3ennu1wfld2ehi4qv9e8zwztj6f</code>).</li>
+            <li>Find the "Approved Domains" section.</li>
+            <li>Add the <strong>exact domain and port</strong> shown in your browser's address bar when you see the read-only editor.
                 Examples:
                 <ul className="list-disc pl-5 mt-1">
-                    <li>If you are running locally: <code>localhost</code> (you may also need to add <code>localhost:your_port_number</code> like <code>localhost:9002</code>).</li>
-                    <li>If you are using a cloud development environment: <code>your-project-name.cloudworkstations.dev</code> (or a wildcard like <code>*.cloudworkstations.dev</code> if TinyMCE supports it).</li>
+                    <li>If running locally: <code>localhost</code>. If using a specific port, add that too, e.g., <code>localhost:9002</code>.</li>
+                    <li>If using a cloud development environment (like Firebase Studio): it might be a long URL like <code>your-project-name.cloudworkstations.dev</code> or <code>6000-firebase-studio-....cloudworkstations.dev</code>. TinyMCE might also support wildcards like <code>*.cloudworkstations.dev</code> for convenience.</li>
                 </ul>
             </li>
-            <li>Save the changes in your TinyMCE dashboard and refresh this page.</li>
+            <li>Save the changes in your TinyMCE dashboard. You may need to wait a few minutes for the changes to propagate.</li>
+            <li>Refresh this page in your application.</li>
           </ul>
         </AlertDescription>
       </Alert>
@@ -138,7 +142,7 @@ export default function CreatePostPage() {
             <Input id="author" name="author" placeholder="Author's name" required className="mt-1"/>
             {state.errors?.author && <p className="text-sm text-red-500 mt-1">{state.errors.author[0]}</p>}
           </div>
-          
+
           <div>
             <Label htmlFor="category">Category</Label>
             <Input id="category" name="category" placeholder="e.g., Technology, Lifestyle" className="mt-1"/>
@@ -156,7 +160,7 @@ export default function CreatePostPage() {
             <Input id="excerpt" name="excerpt" placeholder="A brief summary of the post..." required className="mt-1"/>
             {state.errors?.excerpt && <p className="text-sm text-red-500 mt-1">{state.errors.excerpt[0]}</p>}
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="imageFile">Featured Image (Upload)</Label>
             <Input id="imageFile" name="imageFile" type="file" accept="image/*" onChange={handleImageFileChange} className="mt-1"/>
@@ -174,7 +178,7 @@ export default function CreatePostPage() {
               </div>
             </div>
           )}
-          
+
            <div>
             <Label htmlFor="imageHint">Featured Image AI Hint (Optional, 1-2 words for placeholder)</Label>
             <Input id="imageHint" name="imageHint" placeholder="e.g., abstract tech" className="mt-1"/>
