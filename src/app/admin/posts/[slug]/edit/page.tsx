@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useActionState, useRef, useEffect, useState } from 'react';
+import { useActionState, useRef, useEffect, useState, use } from 'react'; // Added 'use'
 import { useFormStatus } from 'react-dom';
 import { useRouter, notFound } from 'next/navigation';
 import { updateBlogPostAction } from '@/lib/actions';
@@ -16,7 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Terminal } from 'lucide-react';
 import Image from 'next/image';
-import RichTextEditor from '@/components/forms/rich-text-editor';
+import TiptapEditor from '@/components/forms/rich-text-editor'; // Assuming this is the Tiptap editor
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -28,14 +28,18 @@ function SubmitButton() {
 }
 
 interface EditPostPageProps {
-  params: { slug: string };
+  params: { slug: string }; // Keep original type, `use` can handle it
 }
 
-export default function EditPostPage({ params }: EditPostPageProps) {
+export default function EditPostPage({ params: paramsAsProp }: EditPostPageProps) {
   const router = useRouter();
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   
+  // Use React.use to unwrap params if it's a Promise, as suggested by Next.js warning
+  const resolvedParams = use(paramsAsProp);
+  const slug = resolvedParams.slug;
+
   const [post, setPost] = useState<BlogPost | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [imageDataUri, setImageDataUri] = useState<string | null>(null);
@@ -43,18 +47,17 @@ export default function EditPostPage({ params }: EditPostPageProps) {
   const [editorContent, setEditorContent] = useState<string>('');
 
   useEffect(() => {
-    const foundPost = MOCK_BLOG_POSTS.find(p => p.slug === params.slug);
+    // slug is now derived from resolvedParams
+    const foundPost = MOCK_BLOG_POSTS.find(p => p.slug === slug);
     if (foundPost) {
       setPost(foundPost);
       setImageUrlInput(foundPost.imageUrl || '');
       setImagePreviewUrl(foundPost.imageUrl || null);
       setEditorContent(foundPost.content || '');
     } else {
-      // Handle post not found, e.g., redirect or show a message
-      // For now, using Next.js notFound to render the 404 page
       notFound();
     }
-  }, [params.slug]);
+  }, [slug]); // Depend on the resolved 'slug'
 
   const initialState: { message: string | null; errors?: any; isError?: boolean; updatedPostSlug?: string } = { message: null };
   const [state, formAction] = useActionState(updateBlogPostAction, initialState);
@@ -67,7 +70,6 @@ export default function EditPostPage({ params }: EditPostPageProps) {
         variant: state.isError ? 'destructive' : 'default',
       });
       if (!state.isError && state.updatedPostSlug) {
-        // Optional: redirect to the updated post or admin dashboard
         router.push(`/blogs/${state.updatedPostSlug}`);
       }
     }
@@ -85,7 +87,7 @@ export default function EditPostPage({ params }: EditPostPageProps) {
       };
       reader.readAsDataURL(file);
     } else {
-      setImagePreviewUrl(post?.imageUrl || null); // Revert to original if file is cleared
+      setImagePreviewUrl(post?.imageUrl || null); 
       setImageDataUri(null);
     }
   };
@@ -99,7 +101,7 @@ export default function EditPostPage({ params }: EditPostPageProps) {
       const fileInput = document.getElementById('imageFile') as HTMLInputElement;
       if (fileInput) fileInput.value = ''; 
     } else if (!imageDataUri) { 
-      setImagePreviewUrl(post?.imageUrl || null); // Revert to original if URL is cleared and no file uploaded
+      setImagePreviewUrl(post?.imageUrl || null);
     }
   };
 
@@ -108,8 +110,9 @@ export default function EditPostPage({ params }: EditPostPageProps) {
   };
 
   if (!post) {
-    // Still loading or post not found (handled by initial useEffect -> notFound())
-    // You could show a loading spinner here
+    // `use(paramsAsProp)` will suspend if paramsAsProp is a promise.
+    // This loading state will be shown until the post data is fetched and set,
+    // or notFound() is called.
     return <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 text-center">Loading post data...</div>;
   }
 
@@ -195,7 +198,7 @@ export default function EditPostPage({ params }: EditPostPageProps) {
           <div>
             <Label htmlFor="contentEditor">Content</Label>
             <div className="mt-1">
-              <RichTextEditor
+              <TiptapEditor
                 value={editorContent}
                 onEditorChange={handleEditorChange}
               />
@@ -211,4 +214,3 @@ export default function EditPostPage({ params }: EditPostPageProps) {
     </div>
   );
 }
-
