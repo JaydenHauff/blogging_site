@@ -23,7 +23,7 @@ const adminLink = { href: '/admin/dashboard', label: 'Admin' };
 
 export function Header() {
   // Mock authentication status - in a real app, this would come from an auth provider/context
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(true); // Changed to true to show admin button
   const [isMounted, setIsMounted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
