@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useActionState, useRef, useEffect } from 'react';
+import { useActionState, useRef, useEffect, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { createBlogPostAction } from '@/lib/actions';
@@ -13,7 +13,8 @@ import SectionTitle from '@/components/ui/section-title';
 import TranslucentContainer from '@/components/ui/translucent-container';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Terminal } from 'lucide-react';
+import { Terminal, Image as ImageIcon } from 'lucide-react';
+import Image from 'next/image';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -30,6 +31,9 @@ export default function CreatePostPage() {
   const { toast } = useToast();
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  const [imageDataUri, setImageDataUri] = useState<string | null>(null);
+  const [imageUrlInput, setImageUrlInput] = useState<string>('');
 
   useEffect(() => {
     if (state.message) {
@@ -40,14 +44,50 @@ export default function CreatePostPage() {
       });
       if (!state.isError && formRef.current) {
         formRef.current.reset();
+        setImagePreviewUrl(null);
+        setImageDataUri(null);
+        setImageUrlInput('');
         if (state.newPostSlug) {
-          // Optional: Redirect to the new post or to the manage posts page
-          // router.push(`/blogs/${state.newPostSlug}`);
-          router.push('/admin/dashboard'); // Or /admin/posts
+          router.push('/admin/dashboard'); 
         }
       }
     }
   }, [state, toast, router]);
+
+  const handleImageFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const dataUri = reader.result as string;
+        setImagePreviewUrl(dataUri);
+        setImageDataUri(dataUri);
+        setImageUrlInput(''); // Clear URL input if file is chosen
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setImagePreviewUrl(null);
+      setImageDataUri(null);
+    }
+  };
+
+  const handleImageUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const url = event.target.value;
+    setImageUrlInput(url);
+    if (url) {
+      setImagePreviewUrl(url);
+      setImageDataUri(null); // Clear file data if URL is typed
+      // Clear the file input visually, if possible and desired.
+      // This is tricky as file input value is read-only for security.
+      // For now, logic ensures dataUri is cleared.
+      const fileInput = document.getElementById('imageFile') as HTMLInputElement;
+      if (fileInput) fileInput.value = '';
+
+    } else if (!imageDataUri) { // if URL is cleared and no file was selected
+      setImagePreviewUrl(null);
+    }
+  };
+
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
@@ -63,6 +103,8 @@ export default function CreatePostPage() {
 
       <TranslucentContainer baseColor="card" backgroundOpacity={80} padding="p-6 md:p-8">
         <form ref={formRef} action={formAction} className="space-y-6">
+          <input type="hidden" name="imageDataUri" value={imageDataUri || ''} />
+
           <div>
             <Label htmlFor="title">Title</Label>
             <Input id="title" name="title" placeholder="Enter post title" required className="mt-1"/>
@@ -100,12 +142,25 @@ export default function CreatePostPage() {
             {state.errors?.excerpt && <p className="text-sm text-red-500 mt-1">{state.errors.excerpt[0]}</p>}
           </div>
           
-          <div>
-            <Label htmlFor="imageUrl">Image URL (Optional)</Label>
-            <Input id="imageUrl" name="imageUrl" type="url" placeholder="https://placehold.co/600x400.png" className="mt-1"/>
-             {state.errors?.imageUrl && <p className="text-sm text-red-500 mt-1">{state.errors.imageUrl[0]}</p>}
+          {/* Image Upload and URL Input */}
+          <div className="space-y-2">
+            <Label htmlFor="imageFile">Upload Image (from local storage)</Label>
+            <Input id="imageFile" name="imageFile" type="file" accept="image/*" onChange={handleImageFileChange} className="mt-1"/>
+            <p className="text-xs text-muted-foreground mt-1">Or</p>
+            <Label htmlFor="imageUrl">Image URL (paste direct link)</Label>
+            <Input id="imageUrl" name="imageUrl" type="url" placeholder="https://placehold.co/600x400.png" value={imageUrlInput} onChange={handleImageUrlChange} className="mt-1"/>
+            {state.errors?.imageUrl && <p className="text-sm text-red-500 mt-1">{state.errors.imageUrl[0]}</p>}
           </div>
 
+          {imagePreviewUrl && (
+            <div className="mt-4 p-4 border rounded-md bg-muted/30">
+              <Label>Image Preview:</Label>
+              <div className="relative w-full h-64 mt-2 rounded-md overflow-hidden border">
+                <Image src={imagePreviewUrl} alt="Selected image preview" layout="fill" objectFit="contain" />
+              </div>
+            </div>
+          )}
+          
            <div>
             <Label htmlFor="imageHint">Image AI Hint (Optional, 1-2 words for placeholder)</Label>
             <Input id="imageHint" name="imageHint" placeholder="e.g., abstract tech" className="mt-1"/>
@@ -117,13 +172,14 @@ export default function CreatePostPage() {
             <Textarea 
               id="content" 
               name="content" 
-              placeholder="Write your blog post content here... Supports HTML." 
+              placeholder="Write your blog post content here..." 
               rows={15} 
               required 
               className="mt-1"
             />
             <p className="text-xs text-muted-foreground mt-1">
-              Note: This is a basic textarea. A production app should integrate a rich text editor (e.g., Tiptap, Quill) for better styling, image embedding, etc. You can use HTML tags here for now.
+              For styling like bold, italics, or headers, you can use HTML tags directly (e.g., `&lt;strong&gt;bold&lt;/strong&gt;`, `&lt;em&gt;italics&lt;/em&gt;`, `&lt;h1&gt;Header&lt;/h1&gt;`).
+              A rich text editor with toolbar buttons is a planned future enhancement.
             </p>
             {state.errors?.content && <p className="text-sm text-red-500 mt-1">{state.errors.content[0]}</p>}
           </div>
@@ -136,3 +192,4 @@ export default function CreatePostPage() {
     </div>
   );
 }
+

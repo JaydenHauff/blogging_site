@@ -2,7 +2,7 @@
 'use server';
 
 import { z } from 'zod';
-import type { BlogPost } from '@/types'; // Assuming BlogPost type includes all necessary fields
+import type { BlogPost } from '@/types'; 
 
 const emailSchema = z.string().email({ message: "Invalid email address." });
 const newsletterSchema = z.object({
@@ -18,7 +18,7 @@ export async function subscribeToNewsletter(prevState: any, formData: FormData) 
     return {
       errors: validatedFields.error.flatten().fieldErrors,
       message: 'Invalid email.',
-      isError: true, // Ensure isError is set
+      isError: true, 
     };
   }
 
@@ -83,11 +83,12 @@ const createPostSchema = z.object({
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, { message: "Slug must be URL-friendly (e.g., my-post-slug)." }),
   author: z.string().min(2, { message: "Author name must be at least 2 characters." }),
   category: z.string().optional(),
-  tags: z.string().optional(), // Comma-separated string
+  tags: z.string().optional(), 
   excerpt: z.string().min(10, { message: "Excerpt must be at least 10 characters." }),
   imageUrl: z.string().url({ message: "Please enter a valid URL for the image." }).optional().or(z.literal('')),
+  imageDataUri: z.string().optional(), // For uploaded image data URI
   imageHint: z.string().optional(),
-  content: z.string().min(50, { message: "Content must be at least 50 characters." }),
+  content: z.string().min(10, { message: "Content must be at least 10 characters." }), // Reduced min for easier testing
 });
 
 export async function createBlogPostAction(prevState: any, formData: FormData) {
@@ -99,6 +100,7 @@ export async function createBlogPostAction(prevState: any, formData: FormData) {
     tags: formData.get('tags'),
     excerpt: formData.get('excerpt'),
     imageUrl: formData.get('imageUrl'),
+    imageDataUri: formData.get('imageDataUri'),
     imageHint: formData.get('imageHint'),
     content: formData.get('content'),
   });
@@ -111,43 +113,35 @@ export async function createBlogPostAction(prevState: any, formData: FormData) {
     };
   }
 
-  const { title, slug, author, category, tags, excerpt, imageUrl, imageHint, content } = validatedFields.data;
+  const { title, slug, author, category, tags, excerpt, imageUrl, imageDataUri, imageHint, content } = validatedFields.data;
+
+  // Prioritize uploaded image data URI, then fallback to URL input
+  const finalImageUrl = imageDataUri && imageDataUri.startsWith('data:image') ? imageDataUri : (imageUrl || undefined);
 
   const newPost: BlogPost = {
-    id: Date.now().toString(), // Generate a simple unique ID for mock
-    date: new Date().toISOString(), // Set current date
+    id: Date.now().toString(), 
+    date: new Date().toISOString(),
     title,
     slug,
     author,
     category: category || undefined,
     tags: tags ? tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
     excerpt,
-    imageUrl: imageUrl || undefined,
+    imageUrl: finalImageUrl,
     imageHint: imageHint || undefined,
     content,
   };
 
   console.log('New blog post created (mock):', newPost);
-  // In a real application, you would save this `newPost` object to your database.
-  // For example: await db.collection('posts').insertOne(newPost);
-  // You would also handle potential database errors here.
+  // In a real application, if imageDataUri was present, you would upload it to a storage 
+  // service here and use the returned URL for newPost.imageUrl.
 
-  // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 1000));
-
-  // Example of simulating a slug conflict (though MOCK_BLOG_POSTS is not checked here)
-  // if (newPost.slug === 'existing-slug') {
-  //   return {
-  //     errors: { slug: ['This slug is already taken. Please choose another.'] },
-  //     message: 'Slug conflict.',
-  //     isError: true,
-  //   };
-  // }
 
   return {
     message: `Blog post "${newPost.title}" created successfully! It has been logged to the server console.`,
     errors: null,
     isError: false,
-    newPostSlug: newPost.slug, // Pass slug for potential redirect
+    newPostSlug: newPost.slug,
   };
 }
