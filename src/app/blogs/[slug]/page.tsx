@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation';
 import SocialShareButtons from '@/components/blog/social-share-buttons';
 import TranslucentContainer from '@/components/ui/translucent-container';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button'; // Added import
+import { Button } from '@/components/ui/button';
 import { CalendarDays, UserCircle, Tag, Edit3 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import Link from 'next/link';
@@ -80,9 +80,8 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
 
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <SocialShareButtons url={currentUrl} title={post.title} />
-             {/* Placeholder for admin edit link */}
             <Button variant="outline" asChild>
-              <Link href={`/admin/edit-post/${post.slug}`}> {/* Adjust admin route as needed */}
+              <Link href={`/admin/posts/${post.slug}/edit`}>
                 <Edit3 className="mr-2 h-4 w-4" /> Edit Post (Admin)
               </Link>
             </Button>
