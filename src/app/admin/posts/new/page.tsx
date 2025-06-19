@@ -14,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Terminal } from 'lucide-react';
 import Image from 'next/image';
-import RichTextEditor from '@/components/forms/rich-text-editor';
+import RichTextEditor from '@/components/forms/rich-text-editor'; // Updated import
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -100,18 +100,17 @@ export default function CreatePostPage() {
         <AlertDescription>
           Ensure this page and all admin functionalities are protected by authentication in production.
           <br />
-          The rich text editor (ReactQuill) below provides various formatting options. 
-          For image insertion directly within the editor, it typically supports inserting images via URL.
-          The "Featured Image" upload below is separate and intended for the main post image.
+          The Tiptap rich text editor below provides basic formatting options.
+          For image insertion directly within the editor, Tiptap's StarterKit does not include image handling by default;
+          you would need to add an image extension (e.g., `@tiptap/extension-image`).
+          The "Featured Image" upload below is separate for the main post image.
         </AlertDescription>
       </Alert>
 
       <TranslucentContainer baseColor="card" backgroundOpacity={80} padding="p-6 md:p-8">
         <form ref={formRef} action={formAction} className="space-y-6">
-          {/* Hidden input to pass editor content to server action */}
           <input type="hidden" name="content" value={editorContent} />
           <input type="hidden" name="imageDataUri" value={imageDataUri || ''} />
-
 
           <div>
             <Label htmlFor="title">Title</Label>
