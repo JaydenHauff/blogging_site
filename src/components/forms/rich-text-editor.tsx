@@ -20,7 +20,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange }
     setIsMounted(true);
   }, []);
 
-  const modules = {
+  const modules = useMemo(() => ({
     toolbar: [
       [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
       ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
@@ -39,19 +39,19 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange }
 
       ['clean']                                         // remove formatting button
     ],
-  };
+  }), []);
 
-  const formats = [
+  const formats = useMemo(() => [
     'header',
     'bold', 'italic', 'underline', 'strike', 'blockquote', 'code-block',
     'list', 'bullet', 'indent',
     'link', 'image', 'video',
     'color', 'background', 'font', 'align', 'script', 'direction'
-  ];
+  ], []);
 
   if (!isMounted || !ReactQuill) {
     // Render a placeholder on the server and during initial client hydration
-    return <div style={{ minHeight: '300px', border: '1px solid #ccc', borderRadius: '4px', padding: '10px', color: '#888' }}>Loading editor...</div>;
+    return <div style={{ minHeight: '250px', border: '1px solid hsl(var(--border))', borderRadius: '0.375rem', padding: '10px', color: 'hsl(var(--muted-foreground))' }}>Loading editor...</div>;
   }
 
   return (
@@ -61,10 +61,11 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange }
       onChange={onEditorChange}
       modules={modules}
       formats={formats}
-      style={{ minHeight: '300px', backgroundColor: 'var(--card)' }} // Ensure editor area is visible
-      className="bg-card text-card-foreground" // Added classes for better theme integration
+      style={{ backgroundColor: 'hsl(var(--card))' }} // Ensure editor area is visible and uses card background
+      className="quill-editor-container" // Custom class for specific targeting if needed
     />
   );
 };
 
 export default RichTextEditor;
+
