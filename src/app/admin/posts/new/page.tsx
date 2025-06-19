@@ -99,7 +99,13 @@ export default function CreatePostPage() {
         <AlertTitle>Admin Area & Editor Notes</AlertTitle>
         <AlertDescription>
           Ensure this page and all admin functionalities are protected by authentication in production.
-          The TinyMCE editor uses an API key. If it appears read-only or shows a 'This domain is not registered...' notice, please ensure your current domain (e.g., localhost or your specific development URL) is correctly registered in your TinyMCE account settings for the provided API key.
+          The TinyMCE editor uses an API key. <strong>If the editor appears read-only or shows a 'This domain is not registered...' notice:</strong>
+          <ul className="list-disc pl-5 mt-2">
+            <li>Log in to your TinyMCE account.</li>
+            <li>Go to your API key settings.</li>
+            <li>Ensure your current development domain (e.g., <code>localhost</code>, <code>localhost:port</code>, or the cloud development URL like <code>*.cloudworkstations.dev</code>) is added to the list of "Approved Domains" for the API key being used.</li>
+            <li>The API key currently in use is: <code>apf4vetipf1mll3j1pksv3ennu1wfld2ehi4qv9e8zwztj6f</code>.</li>
+          </ul>
         </AlertDescription>
       </Alert>
 
@@ -188,3 +194,4 @@ export default function CreatePostPage() {
     </div>
   );
 }
+
