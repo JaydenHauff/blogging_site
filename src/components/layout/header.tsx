@@ -9,6 +9,8 @@ import React, { useState, useEffect } from 'react'; // Added useState and useEff
 import {
   Sheet,
   SheetContent,
+  SheetHeader,
+  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet" // For mobile menu
 
@@ -81,14 +83,17 @@ export function Header() {
                   <span className="sr-only">Open menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-[280px] sm:w-[320px] bg-sidebar text-sidebar-foreground p-6">
-                <div className="mb-6">
-                  <Link href="/" className="flex items-center space-x-2 text-primary hover:text-accent transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
-                    <BookOpenText className="h-7 w-7" />
-                    <span className="text-2xl font-headline font-bold">MuseBlog</span>
-                  </Link>
-                </div>
-                <nav className="flex flex-col space-y-3">
+              <SheetContent side="left" className="w-[280px] sm:w-[320px] bg-sidebar text-sidebar-foreground p-6 flex flex-col">
+                <SheetHeader className="mb-6">
+                  <SheetTitle asChild>
+                     <Link href="/" className="flex items-center space-x-2 text-primary hover:text-accent transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
+                        <BookOpenText className="h-7 w-7" />
+                        <span className="text-2xl font-headline font-bold">MuseBlog</span>
+                      </Link>
+                  </SheetTitle>
+                  {/* You can add a SheetDescription here if needed */}
+                </SheetHeader>
+                <nav className="flex flex-col space-y-3 flex-grow">
                   {currentNavLinks.map((link) => (
                     <Button
                       key={link.href}
@@ -102,7 +107,7 @@ export function Header() {
                   ))}
                 </nav>
                 {/* Example of how to toggle admin for demo, remove for production */}
-                <div className="mt-8 border-t border-sidebar-border pt-4">
+                <div className="mt-auto border-t border-sidebar-border pt-4">
                   <Button onClick={() => setIsAdmin(!isAdmin)} variant="outline" className="w-full">
                     Toggle Admin View (Dev)
                   </Button>
