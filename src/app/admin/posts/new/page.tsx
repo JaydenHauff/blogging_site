@@ -14,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Terminal, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
-import RichTextEditor from '@/components/forms/rich-text-editor';
+import RichTextEditor from '@/components/forms/rich-text-editor'; // Updated import
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -96,26 +96,13 @@ export default function CreatePostPage() {
 
       <Alert className="mb-8 bg-secondary/50">
         <Terminal className="h-4 w-4" />
-        <AlertTitle>Admin Area & TinyMCE Editor Configuration</AlertTitle>
+        <AlertTitle>Admin Area & Rich Text Editor</AlertTitle>
         <AlertDescription>
           Ensure this page and all admin functionalities are protected by authentication in production.
           <br />
-          The TinyMCE editor uses an API key. <strong>If the editor is read-only (you cannot type in it), or if it displays a 'This domain is not registered...' notice:</strong>
-          This almost always means your current development domain needs to be added to your TinyMCE account's "Approved Domains" list for the API key.
-          <ul className="list-disc pl-5 mt-2">
-            <li>Log in to your <a href="https://www.tiny.cloud/my-account/dashboard/" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">TinyMCE account dashboard</a>.</li>
-            <li>Navigate to your API key settings (the key currently in use is: <code>apf4vetipf1mll3j1pksv3ennu1wfld2ehi4qv9e8zwztj6f</code>).</li>
-            <li>Find the "Approved Domains" section.</li>
-            <li>Add the <strong>exact domain and port</strong> shown in your browser's address bar when you see the read-only editor.
-                Examples:
-                <ul className="list-disc pl-5 mt-1">
-                    <li>If running locally: <code>localhost</code>. If using a specific port, add that too, e.g., <code>localhost:9002</code>.</li>
-                    <li>If using a cloud development environment (like Firebase Studio): it might be a long URL like <code>your-project-name.cloudworkstations.dev</code> or <code>6000-firebase-studio-....cloudworkstations.dev</code>. TinyMCE might also support wildcards like <code>*.cloudworkstations.dev</code> for convenience.</li>
-                </ul>
-            </li>
-            <li>Save the changes in your TinyMCE dashboard. You may need to wait a few minutes for the changes to propagate.</li>
-            <li>Refresh this page in your application.</li>
-          </ul>
+          The rich text editor (ReactQuill) below provides various formatting options.
+          For image insertion directly within the editor, it typically supports inserting images via URL.
+          The "Featured Image" upload below is separate and intended for the main post image.
         </AlertDescription>
       </Alert>
 

@@ -125,3 +125,80 @@ body {
     font-family: var(--font-body), serif;
   }
 }
+
+/* React Quill Specific Styles */
+.ql-editor {
+  min-height: 250px; /* Or your desired min height */
+  font-family: var(--font-body);
+  font-size: 1rem; /* Or your base font size */
+  color: hsl(var(--foreground)); /* Ensure text color matches theme */
+}
+
+.ql-toolbar.ql-snow {
+  border-radius: 0.375rem 0.375rem 0 0; /* Match card border radius top */
+  border-color: hsl(var(--border));
+  background-color: hsl(var(--muted)); /* Light background for toolbar */
+}
+
+.ql-container.ql-snow {
+  border-radius: 0 0 0.375rem 0.375rem; /* Match card border radius bottom */
+  border-color: hsl(var(--border));
+  background-color: hsl(var(--card)); /* Card background for editor area */
+}
+
+/* Ensure toolbar icons use a visible color, try to match foreground or accent */
+.ql-snow .ql-stroke {
+  stroke: hsl(var(--foreground));
+}
+.ql-snow .ql-fill {
+  fill: hsl(var(--foreground));
+}
+.ql-snow .ql-picker-label {
+  color: hsl(var(--foreground));
+}
+.ql-snow .ql-picker-options .ql-picker-item {
+   color: hsl(var(--foreground));
+}
+.ql-snow .ql-picker-options {
+  background-color: hsl(var(--card)); /* Dropdown background */
+  border-color: hsl(var(--border));
+}
+
+.dark .ql-snow .ql-stroke {
+  stroke: hsl(var(--foreground));
+}
+.dark .ql-snow .ql-fill {
+  fill: hsl(var(--foreground));
+}
+.dark .ql-snow .ql-picker-label {
+  color: hsl(var(--foreground));
+}
+.dark .ql-snow .ql-picker-options .ql-picker-item {
+   color: hsl(var(--foreground));
+}
+.dark .ql-snow .ql-picker-options {
+  background-color: hsl(var(--card));
+  border-color: hsl(var(--border));
+}
+.dark .ql-toolbar.ql-snow {
+  background-color: hsl(var(--muted));
+}
+.dark .ql-container.ql-snow {
+  background-color: hsl(var(--card));
+}
+
+/* Custom scrollbar for Quill editor if needed, optional */
+.ql-editor::-webkit-scrollbar {
+  width: 8px;
+}
+.ql-editor::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 4px;
+}
+.ql-editor::-webkit-scrollbar-thumb {
+  background: hsl(var(--accent));
+  border-radius: 4px;
+}
+.ql-editor::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary));
+}
