@@ -14,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Terminal } from 'lucide-react';
 import Image from 'next/image';
-import RichTextEditor from '@/components/forms/rich-text-editor'; // Updated import
+import RichTextEditor from '@/components/forms/rich-text-editor';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -48,7 +48,7 @@ export default function CreatePostPage() {
         setImagePreviewUrl(null);
         setImageDataUri(null);
         setImageUrlInput('');
-        setEditorContent(''); // Reset editor content
+        setEditorContent(''); 
         if (state.newPostSlug) {
           router.push('/admin/dashboard'); 
         }
@@ -100,7 +100,7 @@ export default function CreatePostPage() {
         <AlertDescription>
           Ensure this page and all admin functionalities are protected by authentication in production.
           <br />
-          The Tiptap rich text editor below provides basic formatting options.
+          The Tiptap rich text editor below provides basic formatting options. 
           For image insertion directly within the editor, Tiptap's StarterKit does not include image handling by default;
           you would need to add an image extension (e.g., `@tiptap/extension-image`).
           The "Featured Image" upload below is separate for the main post image.
