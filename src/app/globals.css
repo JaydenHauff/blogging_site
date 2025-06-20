@@ -87,6 +87,7 @@ body {
 /* Tiptap specific styles */
 .ProseMirror {
   @apply min-h-[300px] p-4 focus:outline-none bg-muted/30 text-foreground border border-input border-t-0 rounded-b-md;
+  overflow-y: auto; /* Added to help manage internal scrolling */
 }
 
 .ProseMirror p.is-editor-empty:first-child::before {
@@ -95,6 +96,9 @@ body {
   color: hsl(var(--muted-foreground));
   pointer-events: none;
   height: 0;
+  /* Position the placeholder correctly within padding */
+  position: relative;
+  top: 0; /* Adjust if padding makes it misaligned, already handled by p-4 on .ProseMirror */
 }
 
 .ProseMirror h1, .ProseMirror h2, .ProseMirror h3, .ProseMirror h4, .ProseMirror h5, .ProseMirror h6 {
@@ -106,7 +110,7 @@ body {
 }
 
 .ProseMirror strong {
-  @apply text-foreground/90;
+  @apply text-foreground/90; /* Ensure strong text is visible */
 }
 
 .ProseMirror blockquote {
@@ -144,6 +148,7 @@ body {
 .ProseMirror img.ProseMirror-selectednode {
   @apply outline outline-2 outline-primary outline-offset-2;
 }
+
 
 /* Sidebar specific scrollbar styling if needed */
 [data-sidebar="content"]::-webkit-scrollbar {

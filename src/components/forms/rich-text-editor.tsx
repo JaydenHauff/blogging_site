@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useRef } from 'react';
 import { useEditor, EditorContent, type Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
@@ -14,7 +14,7 @@ import Highlight from '@tiptap/extension-highlight';
 import Subscript from '@tiptap/extension-subscript';
 import Superscript from '@tiptap/extension-superscript';
 import Placeholder from '@tiptap/extension-placeholder';
-import HorizontalRule from '@tiptap/extension-horizontal-rule';
+// HorizontalRule is part of StarterKit, so no separate import needed if configured there.
 
 import { Button } from '@/components/ui/button';
 import {
@@ -24,21 +24,23 @@ import {
 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
-import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface MenuBarProps {
-  editor: Editor; // Editor should not be null here
+  editor: Editor;
 }
 
 const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
-  // No need for `if (!editor) return null;` if RichTextEditor guarantees editor is passed non-null
-
   const commonButtonProps = (actionName: keyof ReturnType<Editor['can']>, params?: any, activeName?: string) => ({
     variant: "outline" as const,
     size: "sm" as const,
-    className: `p-2 h-auto ${editor.isActive(activeName || actionName, params) ? 'bg-primary/20 text-primary' : 'text-foreground'}`,
-    onClick: editor.isEditable ? () => { editor.view.focus(); editor.chain().focus()[actionName as any](params).run(); } : undefined,
-    disabled: !editor.isEditable || (actionName && !editor.can()[actionName as any](params)),
+    className: `p-2 h-auto ${editor.isActive(activeName || actionName as string, params) ? 'bg-primary/20 text-primary' : 'text-foreground'}`,
+    onClick: () => {
+      if (!editor.isEditable) return;
+      editor.view.focus(); // Ensure focus before command chain
+      editor.chain().focus()[actionName as any](params).run();
+    },
+    disabled: !editor.isEditable || !editor.can()[actionName as any](params),
   });
 
   const addImage = useCallback(() => {
@@ -56,12 +58,13 @@ const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
     const previousUrl = editor.getAttributes('link').href;
     const url = window.prompt('Enter URL (leave empty to remove link):', previousUrl);
 
-    if (url === null) return;
+    if (url === null) return; // User cancelled
+    const chain = editor.chain().focus();
     if (url === '') {
-      editor.chain().focus().extendMarkRange('link').unsetLink().run();
-      return;
+      chain.extendMarkRange('link').unsetLink().run();
+    } else {
+      chain.extendMarkRange('link').setLink({ href: url }).run();
     }
-    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
   }, [editor]);
 
   const headingLevels: (1 | 2 | 3)[] = [1, 2, 3];
@@ -89,7 +92,6 @@ const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
       <Button {...commonButtonProps('toggleCodeBlock')} title="Code Block"><Code size={18} /></Button>
       <Button 
         {...commonButtonProps('setHorizontalRule')} 
-        onClick={editor.isEditable ? () => { editor.view.focus(); editor.chain().focus().setHorizontalRule().run(); } : undefined}
         title="Horizontal Rule"
       >
         <Minus size={18} />
@@ -131,7 +133,7 @@ const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
           id="tiptap-color-picker"
           type="color"
           onInput={(event) => { if(editor.isEditable) { editor.view.focus(); editor.chain().focus().setColor((event.target as HTMLInputElement).value).run(); }}}
-          value={editor.getAttributes('textStyle').color || '#ffffff'}
+          value={editor.getAttributes('textStyle').color || '#ffffff'} // Default to white for dark theme picker
           className="w-0 h-0 opacity-0 absolute"
           disabled={!editor.isEditable}
         />
@@ -144,7 +146,7 @@ const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
           id="tiptap-highlight-picker"
           type="color"
           onInput={(event) => { if(editor.isEditable) { editor.view.focus(); editor.chain().focus().toggleHighlight({ color: (event.target as HTMLInputElement).value }).run();}}}
-          value={editor.getAttributes('highlight').color || '#facc15'}
+          value={editor.getAttributes('highlight').color || '#facc15'} // Default highlight yellow
           className="w-0 h-0 opacity-0 absolute"
           disabled={!editor.isEditable}
         />
@@ -178,21 +180,19 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
       StarterKit.configure({
         heading: { levels: [1, 2, 3] },
         codeBlock: { languageClassPrefix: 'language-' },
-        // Ensure blockquote and horizontalRule are enabled by StarterKit or explicitly added
         blockquote: true, 
-        horizontalRule: true,
+        horizontalRule: true, // Enabled in StarterKit
       }),
       Underline,
-      ImageExtension,
+      ImageExtension, // Allows for images
       LinkExtension.configure({ openOnClick: false, autolink: true, linkOnPaste: true }),
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
-      TextStyle,
+      TextStyle, // Required for Color extension
       Color,
       Highlight.configure({ multicolor: true }),
       Subscript,
       Superscript,
       Placeholder.configure({ placeholder: placeholder || 'Start writing...' }),
-      HorizontalRule, 
     ],
     content: value || '',
     editable: true,
@@ -201,16 +201,17 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-xl max-w-none focus:outline-none p-4 min-h-[300px] bg-muted/30 text-foreground border border-input border-t-0 rounded-b-md tiptap-editor-content',
+        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-xl max-w-none', // Base prose styles
       },
     },
   });
 
   useEffect(() => {
-    if (editor && value !== editor.getHTML()) {
-      editor.commands.setContent(value || '', false); 
+    if (editor && editor.isEditable && value !== editor.getHTML()) {
+      // Avoid re-triggering onUpdate by passing 'false' for emitUpdate
+      editor.commands.setContent(value || '', false, { preserveWhitespace: 'full' });
     }
-  }, [value, editor]);
+  }, [value, editor]); // Dependency array includes editor to re-run if editor instance changes
 
   useEffect(() => {
     return () => {
@@ -221,8 +222,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
   if (!editor) {
     return (
       <div className="bg-card rounded-md shadow-sm border border-input">
-        <Skeleton className="h-10 w-full rounded-t-md bg-card" />
-        <Skeleton className="h-[300px] w-full rounded-b-md bg-muted/30" />
+        <Skeleton className="h-10 w-full rounded-t-md bg-card" /> {/* Mimic toolbar */}
+        <Skeleton className="h-[300px] w-full rounded-b-md bg-muted/30" /> {/* Mimic editor area */}
       </div>
     );
   }
