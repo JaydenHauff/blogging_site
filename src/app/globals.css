@@ -9,53 +9,100 @@ body {
 
 @layer base {
   :root {
-    /* Dark Theme Variables */
-    --background: 224 71.4% 4.1%; /* Dark blue-gray */
-    --foreground: 210 20% 98%; /* Almost white */
+    /* MuseBlog Light Theme Variables */
+    --background: 260 50% 96.5%; /* Light grayish-violet: #F2F0F4 */
+    --foreground: 260 10% 20%; /* Dark gray for text */
 
-    --card: 224 71.4% 5.5%; /* Slightly lighter than background for cards */
-    --card-foreground: 210 20% 98%;
+    --card: 260 50% 100%; /* White for cards */
+    --card-foreground: 260 10% 20%;
 
-    --popover: 224 71.4% 6%; /* Consistent with card or slightly different dark */
-    --popover-foreground: 210 20% 98%;
+    --popover: 260 50% 100%; /* White for popovers */
+    --popover-foreground: 260 10% 20%;
 
-    --primary: 262.1 83.3% 62.8%; /* Vibrant Purple - slightly brighter for dark mode */
-    --primary-foreground: 210 20% 98%; /* Text on primary */
+    --primary: 274 40% 64%; /* Muted violet: #9F82C6 */
+    --primary-foreground: 260 50% 98%; /* Almost white for text on primary */
 
-    --secondary: 215 27.9% 16.9%; /* Muted blue-gray */
-    --secondary-foreground: 210 20% 98%;
+    --secondary: 274 25% 85%; /* Lighter, less saturated violet */
+    --secondary-foreground: 274 40% 40%; /* Darker violet for text on secondary */
 
-    --muted: 215 27.9% 12.9%;   /* Darker muted shade */
-    --muted-foreground: 217.9 10.6% 70.9%; /* Lighter gray for muted text on dark */
+    --muted: 260 30% 90%;   /* Light gray for muted elements */
+    --muted-foreground: 260 10% 45%; /* Medium gray for muted text */
 
-    --accent: 170 70% 50%;   /* A contrasting accent - e.g., Teal */
-    --accent-foreground: 210 20% 98%; /* Text on accent */
+    --accent: 274 40% 50%;   /* Soft purple: #6D5496 */
+    --accent-foreground: 260 50% 98%; /* Almost white for text on accent */
 
-    --destructive: 0 62.8% 40.6%;  /* Darker, saturated red */
-    --destructive-foreground: 210 20% 98%;
+    --destructive: 0 70% 55%;  /* A clear, but not overly harsh red */
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 215 27.9% 20.9%;   /* Slightly lighter border for dark mode */
-    --input: 215 27.9% 18.9%;    /* Dark input background */
-    --ring: 262.1 83.3% 67.8%;     /* Lighter primary for rings */
+    --border: 274 30% 80%;   /* Light violet-gray border */
+    --input: 274 30% 92%;    /* Slightly off-white for input backgrounds */
+    --ring: 274 40% 58%;     /* Primary color for focus rings, slightly darker/more saturated */
 
     --radius: 0.5rem;
 
+    /* Chart colors for light theme */
+    --chart-1: 274 50% 60%; /* primary-ish */
+    --chart-2: 290 50% 55%; /* accent-ish */
+    --chart-3: 260 60% 65%; 
+    --chart-4: 240 50% 60%; 
+    --chart-5: 300 50% 60%;
+
+    /* Sidebar - Light Theme */
+    --sidebar-background: 260 40% 94%; /* Slightly off-white, matching overall background lightness */
+    --sidebar-foreground: 260 10% 25%;
+    --sidebar-primary: 274 40% 60%; /* Primary, maybe a bit more saturated for sidebar */
+    --sidebar-primary-foreground: 260 50% 98%;
+    --sidebar-accent: 274 40% 50%; /* Accent */
+    --sidebar-accent-foreground: 260 50% 98%;
+    --sidebar-border: 274 30% 82%;
+    --sidebar-ring: 274 40% 55%;
+  }
+
+  .dark {
+    --background: 260 15% 10%; 
+    --foreground: 260 10% 85%;
+
+    --card: 260 15% 13%; 
+    --card-foreground: 260 10% 85%;
+
+    --popover: 260 15% 12%;
+    --popover-foreground: 260 10% 85%;
+
+    --primary: 274 50% 68%; /* Brighter violet for dark mode */
+    --primary-foreground: 260 10% 15%; 
+
+    --secondary: 260 15% 20%; 
+    --secondary-foreground: 260 10% 80%;
+
+    --muted: 260 15% 18%;   
+    --muted-foreground: 260 10% 60%; 
+
+    --accent: 274 55% 65%;   /* Accent slightly brighter */
+    --accent-foreground: 260 10% 10%; 
+
+    --destructive: 0 60% 50%;  
+    --destructive-foreground: 0 0% 95%;
+
+    --border: 260 15% 25%;   
+    --input: 260 15% 22%;    
+    --ring: 274 50% 70%;   
+
     /* Chart colors for dark theme */
-    --chart-1: 260 70% 65%; 
-    --chart-2: 170 60% 45%; 
-    --chart-3: 30 70% 55%;  
-    --chart-4: 200 65% 50%; 
-    --chart-5: 320 60% 60%; 
+    --chart-1: 274 60% 70%; 
+    --chart-2: 290 60% 65%; 
+    --chart-3: 260 70% 75%;  
+    --chart-4: 240 60% 70%; 
+    --chart-5: 300 60% 70%; 
 
     /* Sidebar - Dark Theme */
-    --sidebar-background: 224 71.4% 6.5%; /* Darker sidebar */
-    --sidebar-foreground: 210 20% 98%;
-    --sidebar-primary: 262.1 83.3% 62.8%;
-    --sidebar-primary-foreground: 210 20% 98%;
-    --sidebar-accent: 170 70% 55%; /* Brighter accent for sidebar */
-    --sidebar-accent-foreground: 210 20% 98%;
-    --sidebar-border: 215 27.9% 22.9%;
-    --sidebar-ring: 262.1 83.3% 67.8%;
+    --sidebar-background: 260 15% 12%; 
+    --sidebar-foreground: 260 10% 85%;
+    --sidebar-primary: 274 50% 68%;
+    --sidebar-primary-foreground: 260 10% 15%;
+    --sidebar-accent: 274 55% 65%;
+    --sidebar-accent-foreground: 260 10% 10%;
+    --sidebar-border: 260 15% 28%;
+    --sidebar-ring: 274 50% 70%;
   }
 }
 
@@ -74,20 +121,20 @@ body {
     @apply bg-card/80 backdrop-blur-md shadow-xl; 
   }
   .translucent-effect-darker { 
-    @apply bg-black/20 backdrop-blur-sm shadow-lg; /* Adjusted for dark theme */
+    @apply bg-black/20 backdrop-blur-sm shadow-lg;
   }
    .font-headline {
-    font-family: var(--font-belleza), serif; /* Updated to use CSS var */
+    font-family: var(--font-belleza), serif;
   }
   .font-body {
-    font-family: var(--font-alegreya), serif; /* Updated to use CSS var */
+    font-family: var(--font-alegreya), serif;
   }
 }
 
 /* Tiptap specific styles */
 .ProseMirror {
   @apply min-h-[300px] p-4 focus:outline-none bg-muted/30 text-foreground border border-input border-t-0 rounded-b-md;
-  overflow-y: auto; /* Added to help manage internal scrolling */
+  overflow-y: auto; 
 }
 
 .ProseMirror p.is-editor-empty:first-child::before {
@@ -96,9 +143,8 @@ body {
   color: hsl(var(--muted-foreground));
   pointer-events: none;
   height: 0;
-  /* Position the placeholder correctly within padding */
   position: relative;
-  top: 0; /* Adjust if padding makes it misaligned, already handled by p-4 on .ProseMirror */
+  top: 0; 
 }
 
 .ProseMirror h1, .ProseMirror h2, .ProseMirror h3, .ProseMirror h4, .ProseMirror h5, .ProseMirror h6 {
@@ -110,7 +156,7 @@ body {
 }
 
 .ProseMirror strong {
-  @apply text-foreground/90; /* Ensure strong text is visible */
+  @apply text-foreground/90;
 }
 
 .ProseMirror blockquote {
@@ -121,7 +167,7 @@ body {
   @apply bg-muted text-foreground p-4 rounded-md overflow-x-auto;
 }
 .ProseMirror pre code {
-   @apply bg-transparent text-inherit p-0; /* Reset code style inside pre */
+   @apply bg-transparent text-inherit p-0; 
 }
 
 .ProseMirror code {
@@ -144,13 +190,18 @@ body {
 
 .ProseMirror img {
   @apply max-w-full h-auto rounded-md my-2;
+  resize: both; /* Added for browser-based resizing */
+  overflow: auto; /* Often needed with resize */
+  cursor: grab; /* Indicate it can be interacted with */
 }
 .ProseMirror img.ProseMirror-selectednode {
   @apply outline outline-2 outline-primary outline-offset-2;
+  cursor: default;
 }
 
 
 /* Sidebar specific scrollbar styling if needed */
+/*
 [data-sidebar="content"]::-webkit-scrollbar {
   width: 6px;
 }
@@ -165,3 +216,4 @@ body {
 [data-sidebar="content"]::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--sidebar-accent));
 }
+*/

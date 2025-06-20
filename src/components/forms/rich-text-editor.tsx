@@ -35,6 +35,10 @@ interface MenuBarProps {
 const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
   const [isImagePopoverOpen, setIsImagePopoverOpen] = useState(false);
   const [imageUrlInput, setImageUrlInput] = useState('');
+  const [imageWidthInput, setImageWidthInput] = useState('');
+  const [imageHeightInput, setImageHeightInput] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
 
   if (!editor) {
     return null;
@@ -55,9 +59,17 @@ const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
   const handleAddImageUrl = () => {
     if (!editor.isEditable || !imageUrlInput) return;
     editor.view.focus();
-    editor.chain().focus().setImage({ src: imageUrlInput }).run();
+    const attrs: { src: string; width?: number; height?: number } = { src: imageUrlInput };
+    const width = parseInt(imageWidthInput, 10);
+    const height = parseInt(imageHeightInput, 10);
+    if (!isNaN(width) && width > 0) attrs.width = width;
+    if (!isNaN(height) && height > 0) attrs.height = height;
+
+    editor.chain().focus().setImage(attrs).run();
     setIsImagePopoverOpen(false);
     setImageUrlInput('');
+    setImageWidthInput('');
+    setImageHeightInput('');
   };
 
   const handleAddImageFile = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,9 +80,18 @@ const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
       const reader = new FileReader();
       reader.onloadend = () => {
         const dataUri = reader.result as string;
-        editor.chain().focus().setImage({ src: dataUri }).run();
+        const attrs: { src: string; width?: number; height?: number } = { src: dataUri };
+        const width = parseInt(imageWidthInput, 10);
+        const height = parseInt(imageHeightInput, 10);
+        if (!isNaN(width) && width > 0) attrs.width = width;
+        if (!isNaN(height) && height > 0) attrs.height = height;
+        
+        editor.chain().focus().setImage(attrs).run();
         setIsImagePopoverOpen(false);
-        if (event.target) event.target.value = ''; 
+        setImageUrlInput('');
+        setImageWidthInput('');
+        setImageHeightInput('');
+        if (fileInputRef.current) fileInputRef.current.value = '';
       };
       reader.readAsDataURL(file);
     }
@@ -134,7 +155,7 @@ const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
         variant="outline"
         size="sm"
         className={`p-2 h-auto ${isCodeActive ? 'bg-primary/20 text-primary' : 'text-foreground'}`}
-        onClick={() => { if(editor.isEditable) { handleCodeToggle(); }}}
+        onClick={() => { if(editor.isEditable) { editor.view.focus(); handleCodeToggle(); }}}
         disabled={!editor.isEditable || !canToggleCodeOrCodeBlock}
         title="Code / Code Block"
       >
@@ -148,7 +169,7 @@ const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
         <Minus size={18} />
       </Button>
       <Separator orientation="vertical" className="h-6" />
-      <Button variant="outline" size="sm" className="p-2 h-auto text-foreground" onClick={() => { if(editor.isEditable) { setLink(); }}} title="Set/Edit Link" disabled={!editor.isEditable || !editor.can().setLink({href: ''})}><Link2 size={18} /></Button>
+      <Button variant="outline" size="sm" className="p-2 h-auto text-foreground" onClick={() => { if(editor.isEditable) { editor.view.focus(); setLink(); }}} title="Set/Edit Link" disabled={!editor.isEditable || !editor.can().setLink({href: ''})}><Link2 size={18} /></Button>
       
       <Popover open={isImagePopoverOpen} onOpenChange={setIsImagePopoverOpen}>
         <PopoverTrigger asChild>
@@ -157,7 +178,8 @@ const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-4 space-y-3 bg-card border-border shadow-lg rounded-md">
-            <p className="text-sm font-medium text-foreground">Add Image</p>
+            <p className="text-sm font-medium text-foreground mb-2">Add Image</p>
+            
             <div className="space-y-1">
               <Label htmlFor="image-url-input" className="text-xs text-muted-foreground">Image URL</Label>
               <Input
@@ -166,17 +188,43 @@ const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
                 placeholder="https://example.com/image.png"
                 value={imageUrlInput}
                 onChange={(e) => setImageUrlInput(e.target.value)}
-                className="w-full bg-input text-foreground"
+                className="w-full bg-input text-foreground text-sm"
               />
-              <Button onClick={handleAddImageUrl} size="sm" className="w-full mt-1" disabled={!imageUrlInput || !editor.isEditable}>
-                Add from URL
-              </Button>
             </div>
+
+            <div className="space-y-1">
+              <Label htmlFor="image-width-input" className="text-xs text-muted-foreground">Width (optional, e.g., 300)</Label>
+              <Input
+                id="image-width-input"
+                type="number"
+                placeholder="px"
+                value={imageWidthInput}
+                onChange={(e) => setImageWidthInput(e.target.value)}
+                className="w-full bg-input text-foreground text-sm"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="image-height-input" className="text-xs text-muted-foreground">Height (optional, e.g., 200)</Label>
+              <Input
+                id="image-height-input"
+                type="number"
+                placeholder="px"
+                value={imageHeightInput}
+                onChange={(e) => setImageHeightInput(e.target.value)}
+                className="w-full bg-input text-foreground text-sm"
+              />
+            </div>
+             <Button onClick={handleAddImageUrl} size="sm" className="w-full mt-2" disabled={!imageUrlInput || !editor.isEditable}>
+                Add from URL
+            </Button>
+            
             <Separator />
+            
             <div className="space-y-1">
               <Label htmlFor="image-file-input" className="text-xs text-muted-foreground">Or Upload from Computer</Label>
               <Input
                 id="image-file-input"
+                ref={fileInputRef}
                 type="file"
                 accept="image/*"
                 onChange={handleAddImageFile}
@@ -220,7 +268,7 @@ const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
           id="tiptap-color-picker"
           type="color"
           onInput={(event) => { if(editor.isEditable) { editor.view.focus(); editor.chain().focus().setColor((event.target as HTMLInputElement).value).run(); }}}
-          value={editor.getAttributes('textStyle').color || (document.documentElement.classList.contains('dark') ? '#ffffff' : '#000000')}
+          value={editor.getAttributes('textStyle').color || (typeof document !== 'undefined' && document.documentElement.classList.contains('dark') ? '#ffffff' : '#000000')}
           className="w-0 h-0 opacity-0 absolute"
           disabled={!editor.isEditable}
         />
@@ -233,7 +281,7 @@ const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
           id="tiptap-highlight-picker"
           type="color"
           onInput={(event) => { if(editor.isEditable) { editor.view.focus(); editor.chain().focus().toggleHighlight({ color: (event.target as HTMLInputElement).value }).run();}}}
-          value={editor.getAttributes('highlight').color || '#facc15'}
+          value={editor.getAttributes('highlight').color || '#facc15'} // Default yellow highlight
           className="w-0 h-0 opacity-0 absolute"
           disabled={!editor.isEditable}
         />
@@ -274,11 +322,11 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
       }),
       Underline,
       ImageExtension.configure({
-        inline: false, // Allows images to be block elements
-        allowBase64: true, // Important for data URIs from local uploads
+        inline: false,
+        allowBase64: true,
       }),
       LinkExtension.configure({ openOnClick: false, autolink: true, linkOnPaste: true }),
-      TextAlign.configure({ types: ['heading', 'paragraph'] }),
+      TextAlign.configure({ types: ['heading', 'paragraph', 'image'] }), // Added image to types
       TextStyle, 
       Color,
       Highlight.configure({ multicolor: true }),
@@ -328,5 +376,3 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
 };
 
 export default RichTextEditor;
-
-    
