@@ -9,97 +9,53 @@ body {
 
 @layer base {
   :root {
-    /* Dark Theme - Modern & Premium */
-    --background: 220 40% 10%; /* Very Dark Desaturated Blue/Charcoal */
-    --foreground: 210 40% 95%; /* Light Gray/Off-white for text */
+    /* Elegant & Airy Light Theme */
+    --background: 220 60% 98%; /* Very Light Cool Gray */
+    --foreground: 220 25% 25%; /* Dark Slate Blue */
 
-    --card: 220 30% 15%; /* Slightly Lighter Dark Blue */
-    --card-foreground: 210 40% 95%;
+    --card: 0 0% 100%;       /* Pure White */
+    --card-foreground: 220 25% 30%;
 
-    --popover: 220 25% 12%; /* Darker Popover */
-    --popover-foreground: 210 40% 95%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 30%;
 
-    --primary: 180 65% 50%; /* Vibrant Teal/Cyan */
-    --primary-foreground: 220 40% 10%; /* Dark, for contrast on primary buttons */
+    --primary: 205 70% 50%; /* Clear, Refined Blue */
+    --primary-foreground: 0 0% 100%; /* White */
 
-    --secondary: 220 20% 25%; /* Darker Muted Blue */
-    --secondary-foreground: 210 40% 90%;
+    --secondary: 210 40% 92%; /* Light Grayish Blue */
+    --secondary-foreground: 220 25% 35%;
 
-    --muted: 220 15% 20%; /* Very Muted Dark Blue */
-    --muted-foreground: 210 20% 65%;
+    --muted: 210 40% 95%;   /* Very Light Gray */
+    --muted-foreground: 210 20% 55%; /* Soft Gray */
 
-    --accent: 35 80% 60%; /* Warm Gold */
-    --accent-foreground: 220 40% 10%; /* Dark, for contrast on accent elements */
+    --accent: 38 90% 60%;   /* Soft Gold/Peach */
+    --accent-foreground: 20 40% 20%; /* Dark Brown for contrast on accent */
 
-    --destructive: 0 70% 50%; /* Slightly desaturated red for dark theme */
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 70% 55%;  /* Balanced Red */
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 220 20% 30%; /* Muted border for dark theme */
-    --input: 220 20% 22%; /* Dark input background */
-    --ring: 180 65% 55%; /* Primary color for rings */
+    --border: 210 30% 88%;   /* Light Gray Border */
+    --input: 210 40% 96%;    /* Slightly off-white input */
+    --ring: 205 70% 55%;     /* Primary color for rings */
 
     --radius: 0.5rem;
 
-    --chart-1: 180 60% 45%;
-    --chart-2: 35 75% 55%;
-    --chart-3: 210 50% 60%;
+    /* Chart colors for light theme */
+    --chart-1: 205 60% 50%;
+    --chart-2: 38 80% 55%;
+    --chart-3: 170 50% 50%;
     --chart-4: 260 60% 65%;
     --chart-5: 150 55% 50%;
 
-    --sidebar-background: 220 35% 12%; /* Consistent with dark theme */
-    --sidebar-foreground: 210 35% 92%;
-    --sidebar-primary: 180 65% 50%;
-    --sidebar-primary-foreground: 220 40% 10%;
-    --sidebar-accent: 35 80% 60%;
-    --sidebar-accent-foreground: 220 40% 10%;
-    --sidebar-border: 220 20% 28%;
-    --sidebar-ring: 180 65% 55%;
-  }
-
-  .dark {
-    /* Using the same dark theme for .dark for consistency, can be customized further if needed */
-    --background: 220 40% 10%;
-    --foreground: 210 40% 95%;
-
-    --card: 220 30% 15%;
-    --card-foreground: 210 40% 95%;
-
-    --popover: 220 25% 12%;
-    --popover-foreground: 210 40% 95%;
-
-    --primary: 180 65% 50%;
-    --primary-foreground: 220 40% 10%;
-
-    --secondary: 220 20% 25%;
-    --secondary-foreground: 210 40% 90%;
-
-    --muted: 220 15% 20%;
-    --muted-foreground: 210 20% 65%;
-
-    --accent: 35 80% 60%;
-    --accent-foreground: 220 40% 10%;
-
-    --destructive: 0 70% 50%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 220 20% 30%;
-    --input: 220 20% 22%;
-    --ring: 180 65% 55%;
-
-    --chart-1: 180 60% 45%;
-    --chart-2: 35 75% 55%;
-    --chart-3: 210 50% 60%;
-    --chart-4: 260 60% 65%;
-    --chart-5: 150 55% 50%;
-    
-    --sidebar-background: 220 35% 12%;
-    --sidebar-foreground: 210 35% 92%;
-    --sidebar-primary: 180 65% 50%;
-    --sidebar-primary-foreground: 220 40% 10%;
-    --sidebar-accent: 35 80% 60%;
-    --sidebar-accent-foreground: 220 40% 10%;
-    --sidebar-border: 220 20% 28%;
-    --sidebar-ring: 180 65% 55%;
+    /* Sidebar - Light Theme */
+    --sidebar-background: 220 50% 96%;
+    --sidebar-foreground: 220 25% 30%;
+    --sidebar-primary: 205 70% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 38 90% 60%;
+    --sidebar-accent-foreground: 20 40% 20%;
+    --sidebar-border: 210 30% 85%;
+    --sidebar-ring: 205 70% 55%;
   }
 }
 
@@ -114,11 +70,11 @@ body {
 }
 
 @layer utilities {
-  .translucent-effect {
-    @apply bg-card/60 backdrop-blur-lg shadow-xl; /* Adjusted for dark theme */
+  .translucent-effect { 
+    @apply bg-card/80 backdrop-blur-md shadow-xl; 
   }
-  .translucent-effect-darker {
-    @apply bg-black/30 backdrop-blur-md shadow-xl; /* Adjusted for dark theme */
+  .translucent-effect-darker { 
+    @apply bg-black/5 backdrop-blur-sm shadow-lg;
   }
    .font-headline {
     font-family: var(--font-headline), serif;
@@ -128,10 +84,10 @@ body {
   }
 }
 
-/* Tiptap Editor Styles */
-.ProseMirror {
+/* Tiptap Editor Styles for Light Theme */
+.ProseMirror { /* This class is applied by Tiptap to the editable area */
   outline: none;
-  border-color: hsl(var(--border));
+  /* The 'tiptap' class below will handle border and radius for the container */
 }
 
 .ProseMirror p.is-editor-empty:first-child::before {
@@ -142,9 +98,21 @@ body {
   height: 0;
 }
 
-.tiptap {
-  @apply p-4 min-h-[250px] border rounded-b-md bg-card text-foreground focus:outline-none; /* Adjusted for dark theme */
+.tiptap-toolbar {
+  @apply flex flex-wrap items-center gap-1 p-2 border border-input border-b-0 rounded-t-md bg-muted;
 }
+
+.tiptap-toolbar > button svg {
+  @apply h-5 w-5; 
+}
+
+/* Styles for the Tiptap editor container/wrapper */
+.tiptap { /* This class is applied via editorProps to the ProseMirror element */
+  @apply p-4 min-h-[300px] border border-input rounded-b-md bg-card text-foreground focus:outline-none;
+  /* Removed 'prose max-w-none' from @apply. These will be added directly to the element's class attribute. */
+}
+
+/* Default margins for elements within Tiptap, if needed beyond what 'prose' provides */
 .tiptap > *:first-child {
   margin-top: 0;
 }

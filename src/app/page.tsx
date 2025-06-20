@@ -8,13 +8,13 @@ import { NewsletterForm } from '@/components/forms/newsletter-form';
 import { MOCK_BLOG_POSTS, SITE_NAME, SITE_DESCRIPTION, MOCK_TEAM_MEMBERS } from '@/lib/constants';
 import TranslucentContainer from '@/components/ui/translucent-container';
 import { ArrowRight, Zap, Users, Edit3, BarChart3, BookOpenCheck, Lightbulb, MessageSquareHeart, Rocket } from 'lucide-react';
-import TeamMemberCard from '@/components/about/team-member-card'; // Re-using for author spotlight
+import TeamMemberCard from '@/components/about/team-member-card'; 
 
 const featuredCategories = [
-  { name: 'Technology', icon: Zap, description: 'Latest in tech, AI, and gadgets.', slug: 'technology', hint: "circuit board" },
-  { name: 'Creative Writing', icon: Edit3, description: 'Tips, inspiration, and showcases.', slug: 'creative-writing', hint: "vintage typewriter" },
-  { name: 'Personal Growth', icon: BarChart3, description: 'Insights for a better you.', slug: 'personal-growth', hint: "mountain sunrise" },
-  { name: 'Book Reviews', icon: BookOpenCheck, description: 'Deep dives into compelling reads.', slug: 'book-reviews', hint: "books library" },
+  { name: 'Technology', icon: Zap, description: 'Latest in tech, AI, and gadgets.', slug: 'technology', hint: "modern circuit" },
+  { name: 'Creative Writing', icon: Edit3, description: 'Tips, inspiration, and showcases.', slug: 'creative-writing', hint: "elegant pen" },
+  { name: 'Personal Growth', icon: BarChart3, description: 'Insights for a better you.', slug: 'personal-growth', hint: "person silhouette sunrise" },
+  { name: 'Book Reviews', icon: BookOpenCheck, description: 'Deep dives into compelling reads.', slug: 'book-reviews', hint: "stack books" },
 ];
 
 const whyMuseBlog = [
@@ -33,16 +33,16 @@ export default function Home() {
       {/* Hero Section */}
       <section 
         className="relative min-h-[calc(100vh-5rem)] flex items-center justify-center py-20 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('https://placehold.co/1920x1080.png')" }} /* Keep placeholder, but hint changes */
-        data-ai-hint="dark abstract technology" /* Updated hint for dark theme */
+        style={{ backgroundImage: "url('https://placehold.co/1920x1080.png')" }} 
+        data-ai-hint="bright abstract geometric" 
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-transparent to-accent/30 backdrop-blur-sm"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/20 backdrop-blur-sm"></div> {/* Adjusted overlay for light theme */}
         <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
           <TranslucentContainer 
             className="max-w-3xl mx-auto" 
             padding="p-8 md:p-12"
-            baseColor="background" /* Changed from white to background for dark theme */
-            backgroundOpacity={20} /* Adjusted opacity */
+            baseColor="background" 
+            backgroundOpacity={60} 
             blurStrength="md"
             shadow="shadow-2xl"
           >
@@ -64,14 +64,14 @@ export default function Home() {
       {/* Recent Blog Posts Section */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-8">
         <SectionTitle title="Latest Musings" subtitle="Discover our most recent articles and dive into compelling stories." />
-        <div className="grid grid-cols-1 lg:grid-cols-1 gap-8"> {/* Changed to single column for horizontal cards */}
+        <div className="grid grid-cols-1 lg:grid-cols-1 gap-8"> 
           {recentPosts.map((post) => (
             <BlogPostCard key={post.id} post={post} orientation="horizontal" />
           ))}
         </div>
         {MOCK_BLOG_POSTS.length > 3 && (
           <div className="mt-12 text-center">
-            <Button size="lg" variant="outline" asChild className="border-primary text-primary hover:bg-primary/10 transition-colors duration-300">
+            <Button size="lg" variant="outline" asChild className="border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors duration-300">
               <Link href="/blogs">View All Posts</Link>
             </Button>
           </div>
@@ -79,7 +79,7 @@ export default function Home() {
       </section>
 
       {/* Featured Categories Section */}
-      <section className="py-16 md:py-24 bg-background/50"> {/* Subtle background difference */}
+      <section className="py-16 md:py-24 bg-muted/50"> 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <SectionTitle title="Explore Topics" subtitle="Dive into categories that pique your interest." />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -87,14 +87,14 @@ export default function Home() {
               <TranslucentContainer
                 key={category.slug}
                 baseColor="card"
-                backgroundOpacity={60}
+                backgroundOpacity={90} 
                 padding="p-6"
                 className="text-center group hover:scale-105 transition-transform duration-300"
                 shadow="shadow-xl"
                 rounded="rounded-lg"
               >
                 <Link href={`/blogs?category=${category.slug}`} className="flex flex-col items-center">
-                  <div className="p-4 bg-primary/20 rounded-full mb-4 group-hover:bg-primary/30 transition-colors">
+                  <div className="p-4 bg-primary/10 rounded-full mb-4 group-hover:bg-primary/20 transition-colors">
                     <category.icon className="h-10 w-10 text-primary" />
                   </div>
                   <h3 className="text-xl font-headline font-semibold text-primary mb-2">{category.name}</h3>
@@ -114,7 +114,7 @@ export default function Home() {
             <TranslucentContainer 
               key={item.title}
               baseColor="card"
-              backgroundOpacity={70}
+              backgroundOpacity={95} 
               padding="p-6"
               className="flex flex-col items-center text-center"
             >
@@ -128,7 +128,7 @@ export default function Home() {
 
       {/* Author Spotlight Section */}
       {authorSpotlight && (
-        <section className="py-16 md:py-24 bg-secondary/30">
+        <section className="py-16 md:py-24 bg-secondary/30"> {/* secondary/30 provides a subtle bg variation */}
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <SectionTitle title="Meet Our Voice" subtitle={`Get to know ${authorSpotlight.name}, one of the creative minds at ${SITE_NAME}.`} />
             <div className="max-w-xl mx-auto">
@@ -139,13 +139,13 @@ export default function Home() {
       )}
 
       {/* Newsletter Subscription Section */}
-      <section className="py-16 md:py-24 bg-gradient-to-r from-primary/5 to-accent/5">
+      <section className="py-16 md:py-24 bg-gradient-to-r from-primary/5 to-accent/5"> 
          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <TranslucentContainer 
             className="max-w-2xl mx-auto"
             padding="p-8 md:p-12"
-            baseColor="card" /* Changed from background to card for better contrast in dark mode */
-            backgroundOpacity={50}
+            baseColor="card" 
+            backgroundOpacity={80} 
             blurStrength="lg"
             shadow="shadow-xl"
           >

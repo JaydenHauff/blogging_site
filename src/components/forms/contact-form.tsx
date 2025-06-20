@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useActionState } from 'react';
@@ -35,7 +36,7 @@ export function ContactForm() {
         variant: state.isError ? 'destructive' : 'default',
       });
       if (!state.isError && formRef.current) {
-        formRef.current.reset(); // Reset form on success
+        formRef.current.reset(); 
       }
     }
   }, [state, toast]);
@@ -50,7 +51,7 @@ export function ContactForm() {
           id="name" 
           placeholder="John Doe" 
           required 
-          className="mt-1 bg-background/70 border-primary/30 focus:border-primary focus:ring-primary"
+          className="mt-1 bg-background/70 border-border focus:border-primary focus:ring-primary" // Updated for light theme
         />
         {state.errors?.name && state.errors.name.map((error: string) => (
           <p key={error} className="text-sm text-red-500 mt-1">{error}</p>
@@ -64,7 +65,7 @@ export function ContactForm() {
           id="email" 
           placeholder="you@example.com" 
           required 
-          className="mt-1 bg-background/70 border-primary/30 focus:border-primary focus:ring-primary"
+          className="mt-1 bg-background/70 border-border focus:border-primary focus:ring-primary" // Updated for light theme
         />
          {state.errors?.email && state.errors.email.map((error: string) => (
           <p key={error} className="text-sm text-red-500 mt-1">{error}</p>
@@ -78,7 +79,7 @@ export function ContactForm() {
           rows={5} 
           placeholder="Your message..." 
           required 
-          className="mt-1 bg-background/70 border-primary/30 focus:border-primary focus:ring-primary"
+          className="mt-1 bg-background/70 border-border focus:border-primary focus:ring-primary" // Updated for light theme
         />
         {state.errors?.message && state.errors.message.map((error: string) => (
           <p key={error} className="text-sm text-red-500 mt-1">{error}</p>

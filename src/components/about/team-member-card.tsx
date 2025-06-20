@@ -12,13 +12,13 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({ member }) => {
     <TranslucentContainer 
       className="text-center"
       baseColor="card"
-      backgroundOpacity={70}
-      padding="p-6 md:p-8" /* Increased padding slightly */
-      shadow="shadow-xl hover:shadow-2xl transition-shadow duration-300" /* Enhanced shadow */
+      backgroundOpacity={90} /* Adjusted for light theme visibility */
+      padding="p-6 md:p-8" 
+      shadow="shadow-xl hover:shadow-2xl transition-shadow duration-300"
       rounded="rounded-lg"
     >
       {member.imageUrl && (
-        <div className="relative w-32 h-32 md:w-40 md:h-40 mx-auto mb-6 rounded-full overflow-hidden shadow-md border-4 border-primary/30"> {/* Adjusted border color for new theme */}
+        <div className="relative w-32 h-32 md:w-40 md:h-40 mx-auto mb-6 rounded-full overflow-hidden shadow-md border-4 border-primary/20"> {/* Adjusted border for light theme */}
           <Image
             src={member.imageUrl}
             alt={member.name}

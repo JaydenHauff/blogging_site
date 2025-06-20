@@ -34,28 +34,31 @@ export function Header() {
 
   const currentNavLinks = isAdmin ? [...navLinksBase, adminLink] : navLinksBase;
 
-  if (!isMounted) {
-    return (
-      <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out bg-background/90 backdrop-blur-lg shadow-md"> {/* Updated for dark theme */}
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <Link href="/" className="flex items-center space-x-2 text-primary hover:text-accent transition-colors">
-              <BookOpenText className="h-8 w-8" />
-              <span className="text-3xl font-headline font-bold">MuseBlog</span>
-            </Link>
-            <div className="md:hidden">
-              <Button variant="ghost" size="icon">
-                <PanelLeft className="h-6 w-6" />
-              </Button>
-            </div>
+  // Basic header structure for SSR/initial mount to avoid hydration mismatch
+  const ssrHeader = (
+    <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out bg-background/80 backdrop-blur-lg shadow-md">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-20">
+          <Link href="/" className="flex items-center space-x-2 text-primary hover:text-accent transition-colors">
+            <BookOpenText className="h-8 w-8" />
+            <span className="text-3xl font-headline font-bold">MuseBlog</span>
+          </Link>
+          <div className="md:hidden">
+            <Button variant="ghost" size="icon" aria-label="Open menu">
+              <PanelLeft className="h-6 w-6" />
+            </Button>
           </div>
         </div>
-      </header>
-    );
+      </div>
+    </header>
+  );
+
+  if (!isMounted) {
+    return ssrHeader;
   }
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out bg-background/90 backdrop-blur-lg shadow-md"> {/* Updated for dark theme */}
+    <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out bg-background/80 backdrop-blur-lg shadow-md"> {/* Adjusted opacity for light theme */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           <Link href="/" className="flex items-center space-x-2 text-primary hover:text-accent transition-colors">
@@ -72,15 +75,14 @@ export function Header() {
           <div className="md:hidden">
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" aria-label="Open menu">
                   <PanelLeft className="h-6 w-6" />
-                  <span className="sr-only">Open menu</span>
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-[280px] sm:w-[320px] bg-sidebar text-sidebar-foreground p-6 flex flex-col">
                 <SheetHeader className="mb-6 border-b border-sidebar-border pb-4">
                   <SheetTitle asChild>
-                     <Link href="/" className="flex items-center space-x-2 text-primary hover:text-accent transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
+                     <Link href="/" className="flex items-center space-x-2 text-sidebar-primary hover:text-sidebar-accent transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
                         <BookOpenText className="h-7 w-7" />
                         <span className="text-2xl font-headline font-bold">MuseBlog</span>
                       </Link>
@@ -103,8 +105,8 @@ export function Header() {
                   <Button onClick={() => setIsAdmin(!isAdmin)} variant="outline" className="w-full border-sidebar-accent text-sidebar-accent hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
                     Toggle Admin View (Dev)
                   </Button>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Note: Admin link visibility is currently mocked.
+                  <p className="text-xs text-muted-foreground mt-2 text-center">
+                    Note: Admin link visibility is mocked for development.
                   </p>
                 </div>
               </SheetContent>

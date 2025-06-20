@@ -8,9 +8,9 @@ interface TranslucentContainerProps {
   padding?: string;
   blurStrength?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | 'none';
   backgroundOpacity?: number; // 0-100
-  baseColor?: 'white' | 'black' | 'background' | 'card' | 'primary' | 'secondary' | 'accent'; // Expanded baseColor options
-  rounded?: string; // e.g., "rounded-lg", "rounded-xl"
-  shadow?: string; // e.g., "shadow-md", "shadow-xl"
+  baseColor?: 'white' | 'black' | 'background' | 'card' | 'primary' | 'secondary' | 'accent' | 'muted';
+  rounded?: string; 
+  shadow?: string; 
 }
 
 const TranslucentContainer: React.FC<TranslucentContainerProps> = ({
@@ -18,57 +18,56 @@ const TranslucentContainer: React.FC<TranslucentContainerProps> = ({
   className,
   padding = "p-6",
   blurStrength = "lg",
-  backgroundOpacity = 20,
-  baseColor = "card", // Defaulted to 'card' which is better for dark themes
+  backgroundOpacity = 80, // Default opacity for light theme might be higher
+  baseColor = "card", 
   rounded = "rounded-xl",
   shadow = "shadow-lg",
 }) => {
   const blurClass = blurStrength !== 'none' ? `backdrop-blur-${blurStrength}` : '';
-  
-  let bgClass = '';
-  // Updated to handle new base colors and ensure opacity is applied correctly
-  // The number in bg-opacity-[X] is a percentage, so we convert backgroundOpacity
   const opacityValue = Math.max(0, Math.min(100, backgroundOpacity));
+
+  let backgroundColorStyle: React.CSSProperties = {};
+
+  // Using CSS variables for background colors to ensure theme consistency
+  // and applying opacity through the /<value> syntax if available or via rgba for white/black
+  let effectiveBgClass = '';
 
   switch (baseColor) {
     case 'white':
-      bgClass = `bg-white bg-opacity-${opacityValue}`; // Tailwind CSS v2 style opacity
+      backgroundColorStyle = { backgroundColor: `rgba(255, 255, 255, ${opacityValue / 100})` };
       break;
     case 'black':
-      bgClass = `bg-black bg-opacity-${opacityValue}`;
+      backgroundColorStyle = { backgroundColor: `rgba(0, 0, 0, ${opacityValue / 100})` };
       break;
     case 'background':
-      bgClass = `bg-background bg-opacity-${opacityValue}`;
+      effectiveBgClass = `bg-background/${opacityValue}`;
+      // For older Tailwind or specific needs:
+      // backgroundColorStyle = { backgroundColor: `hsl(var(--background) / ${opacityValue / 100})` };
       break;
     case 'card':
-      bgClass = `bg-card bg-opacity-${opacityValue}`;
+      effectiveBgClass = `bg-card/${opacityValue}`;
+      // backgroundColorStyle = { backgroundColor: `hsl(var(--card) / ${opacityValue / 100})` };
       break;
     case 'primary':
-      bgClass = `bg-primary bg-opacity-${opacityValue}`;
+      effectiveBgClass = `bg-primary/${opacityValue}`;
+      // backgroundColorStyle = { backgroundColor: `hsl(var(--primary) / ${opacityValue / 100})` };
       break;
     case 'secondary':
-      bgClass = `bg-secondary bg-opacity-${opacityValue}`;
+      effectiveBgClass = `bg-secondary/${opacityValue}`;
+      // backgroundColorStyle = { backgroundColor: `hsl(var(--secondary) / ${opacityValue / 100})` };
       break;
     case 'accent':
-      bgClass = `bg-accent bg-opacity-${opacityValue}`;
+      effectiveBgClass = `bg-accent/${opacityValue}`;
+      // backgroundColorStyle = { backgroundColor: `hsl(var(--accent) / ${opacityValue / 100})` };
+      break;
+    case 'muted':
+      effectiveBgClass = `bg-muted/${opacityValue}`;
+      // backgroundColorStyle = { backgroundColor: `hsl(var(--muted) / ${opacityValue / 100})` };
       break;
     default:
-      bgClass = `bg-card bg-opacity-${opacityValue}`; // Default to card
+      effectiveBgClass = `bg-card/${opacityValue}`;
+      // backgroundColorStyle = { backgroundColor: `hsl(var(--card) / ${opacityValue / 100})` };
   }
-   // Fallback for Tailwind JIT if direct opacity classes like bg-card/60 don't work for all baseColors
-   // This construct uses CSS variables which are more reliable.
-   let style: React.CSSProperties = {};
-   if (baseColor === 'background') style = {'--tw-bg-opacity': `${opacityValue / 100}`, backgroundColor: `hsl(var(--background) / var(--tw-bg-opacity))`};
-   else if (baseColor === 'card') style = {'--tw-bg-opacity': `${opacityValue / 100}`, backgroundColor: `hsl(var(--card) / var(--tw-bg-opacity))`};
-   else if (baseColor === 'primary') style = {'--tw-bg-opacity': `${opacityValue / 100}`, backgroundColor: `hsl(var(--primary) / var(--tw-bg-opacity))`};
-   else if (baseColor === 'secondary') style = {'--tw-bg-opacity': `${opacityValue / 100}`, backgroundColor: `hsl(var(--secondary) / var(--tw-bg-opacity))`};
-   else if (baseColor === 'accent') style = {'--tw-bg-opacity': `${opacityValue / 100}`, backgroundColor: `hsl(var(--accent) / var(--tw-bg-opacity))`};
-   else if (baseColor === 'white') style = {'--tw-bg-opacity': `${opacityValue / 100}`, backgroundColor: `rgba(255, 255, 255, ${opacityValue / 100})`};
-   else if (baseColor === 'black') style = {'--tw-bg-opacity': `${opacityValue / 100}`, backgroundColor: `rgba(0, 0, 0, ${opacityValue / 100})`};
-   // If using Tailwind CSS v3+, bg-card/${backgroundOpacity} should work, but above is more robust for CSS vars
-   // Forcing style for hsl vars
-    bgClass = `bg-${baseColor}/${opacityValue}`;
-
 
   return (
     <div
@@ -77,10 +76,10 @@ const TranslucentContainer: React.FC<TranslucentContainerProps> = ({
         shadow,
         padding,
         blurClass,
-        // bgClass, // Let style attribute handle this for HSL colors
+        effectiveBgClass, // Apply Tailwind JIT class for opacity
         className
       )}
-      style={style} // Apply dynamic style for HSL background opacity
+      style={backgroundColorStyle} // Apply style for white/black or if specific HSL manipulation is needed
     >
       {children}
     </div>
