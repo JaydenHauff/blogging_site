@@ -1,8 +1,7 @@
-
 'use client';
 
-import React, { useEffect, useState } from 'react';
-// ReactQuill and its CSS will be dynamically imported or CSS imported globally.
+import React, { useEffect, useState, useRef } from 'react';
+// CSS for react-quill is imported globally in src/app/globals.css
 
 interface RichTextEditorProps {
   value?: string;
@@ -10,72 +9,81 @@ interface RichTextEditorProps {
   placeholder?: string;
 }
 
-// Dynamically import ReactQuill to ensure it's only loaded on the client-side
-const ReactQuill = typeof window === 'object' ? require('react-quill') : () => null;
-// CSS is now imported globally in globals.css
-
-
-const modules = {
+// Define modules and formats outside the component to prevent re-creation on every render
+const modulesConfig = {
   toolbar: [
     [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-    ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+    ['bold', 'italic', 'underline', 'strike'],
     ['blockquote', 'code-block'],
-
     [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-    [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
-    [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
-    [{ 'direction': 'rtl' }],                         // text direction
+    [{ 'script': 'sub'}, { 'script': 'super' }],
+    [{ 'indent': '-1'}, { 'indent': '+1' }],
+    [{ 'direction': 'rtl' }],
     [{ 'align': [] }],
-
-    [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
-    // [{ 'font': [] }], // Font selection can be large, omitting for now
-
-    ['link', 'image', 'video'],                       // link, image, video
-
-    ['clean']                                         // remove formatting button
+    [{ 'color': [] }, { 'background': [] }],
+    ['link', 'image', 'video'],
+    ['clean']
   ],
 };
 
-const formats = [
+const formatsConfig = [
   'header',
   'bold', 'italic', 'underline', 'strike', 'blockquote', 'code-block',
   'list', 'bullet', 'script', 'indent', 'direction', 'align',
-  'color', 'background', 
+  'color', 'background',
   'link', 'image', 'video'
 ];
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, placeholder }) => {
-  const [editorHtml, setEditorHtml] = useState(value || '');
+  const [editorHtml, setEditorHtml] = useState<string>(value || '');
+  const QuillComponentRef = useRef<any>(null); // Store the dynamically imported component
+  const [isMounted, setIsMounted] = useState<boolean>(false);
 
-  // When the external value changes, update the editor's content
   useEffect(() => {
-    if (value !== editorHtml) {
-      setEditorHtml(value || '');
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value]); // Only re-run if 'value' prop changes
+    setIsMounted(true); // Mark as mounted
+  }, []);
 
+  useEffect(() => {
+    // Only attempt to import Quill if mounted and not already loaded
+    if (isMounted && !QuillComponentRef.current) {
+      import('react-quill').then(module => {
+        QuillComponentRef.current = module.default;
+        // Force a re-render now that Quill is loaded
+        // A simple state update will trigger this.
+        setEditorHtml(currentHtml => currentHtml); 
+      }).catch(error => console.error("Failed to load ReactQuill", error));
+    }
+  }, [isMounted]); // Dependency on isMounted ensures this runs after mount
+
+  // Sync external value changes to editorHtml
+  useEffect(() => {
+    if (isMounted && value !== undefined && value !== editorHtml) {
+      setEditorHtml(value);
+    }
+  }, [value, editorHtml, isMounted]);
 
   const handleChange = (html: string) => {
     setEditorHtml(html);
-    onEditorChange(html);
+    onEditorChange(html); // Propagate change to parent
   };
 
-  if (typeof window !== 'object' || !ReactQuill) {
-    // Return a placeholder or null during SSR or if window is not available
-    return <div className="h-[300px] w-full rounded-md border border-input bg-muted animate-pulse" />;
+  // If not mounted or Quill component hasn't been loaded yet, show a placeholder
+  if (!isMounted || !QuillComponentRef.current) {
+    return <div className="h-[300px] w-full rounded-md border border-input bg-muted animate-pulse" aria-label="Loading editor..."/>;
   }
 
+  const ReactQuill = QuillComponentRef.current;
+
   return (
-    <div className="bg-card rounded-md border border-input shadow-sm">
+    <div className="bg-card rounded-md border border-input shadow-sm quill-editor-container-wrapper"> {/* Added a wrapper class if needed for specific styling scopes */}
       <ReactQuill
         theme="snow"
         value={editorHtml}
         onChange={handleChange}
-        modules={modules}
-        formats={formats}
+        modules={modulesConfig}
+        formats={formatsConfig}
         placeholder={placeholder || "Start writing..."}
-        className="quill-editor-container" // Custom class for global styling
+        className="quill-editor-container" // For specific styling needs of the editor itself
       />
     </div>
   );
