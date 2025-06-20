@@ -1,18 +1,18 @@
 
-'use client'; // Required for useState
+'use client'; 
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { BookOpenText, LogIn, PanelLeft } from 'lucide-react'; // Added LogIn for potential future use, PanelLeft for mobile
+import { BookOpenText, PanelLeft } from 'lucide-react'; 
 import { cn } from '@/lib/utils';
-import React, { useState, useEffect } from 'react'; // Added useState and useEffect
+import React, { useState, useEffect } from 'react'; 
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet" // For mobile menu
+} from "@/components/ui/sheet" 
 
 const navLinksBase = [
   { href: '/', label: 'Home' },
@@ -24,25 +24,19 @@ const navLinksBase = [
 const adminLink = { href: '/admin/dashboard', label: 'Admin' };
 
 export function Header() {
-  // Mock authentication status - in a real app, this would come from an auth provider/context
-  const [isAdmin, setIsAdmin] = useState(true); // Changed to true to show admin button
+  const [isAdmin, setIsAdmin] = useState(true); 
   const [isMounted, setIsMounted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
-    // To test admin view, you can temporarily set isAdmin to true here, e.g., by checking localStorage or a query param.
-    // For example: localStorage.setItem('isAdmin', 'true');
-    // const adminStatus = localStorage.getItem('isAdmin') === 'true';
-    // setIsAdmin(adminStatus);
   }, []);
 
   const currentNavLinks = isAdmin ? [...navLinksBase, adminLink] : navLinksBase;
 
   if (!isMounted) {
-    // Avoid rendering mismatch during hydration by returning a simplified header or null
     return (
-      <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out bg-background/80 backdrop-blur-md shadow-sm">
+      <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out bg-background/90 backdrop-blur-lg shadow-md"> {/* Updated for dark theme */}
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             <Link href="/" className="flex items-center space-x-2 text-primary hover:text-accent transition-colors">
@@ -61,7 +55,7 @@ export function Header() {
   }
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out bg-background/80 backdrop-blur-md shadow-sm">
+    <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out bg-background/90 backdrop-blur-lg shadow-md"> {/* Updated for dark theme */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           <Link href="/" className="flex items-center space-x-2 text-primary hover:text-accent transition-colors">
@@ -70,7 +64,7 @@ export function Header() {
           </Link>
           <nav className="hidden md:flex space-x-1">
             {currentNavLinks.map((link) => (
-              <Button key={link.href} variant="ghost" asChild className="text-foreground hover:bg-primary/10 hover:text-primary transition-colors duration-300">
+              <Button key={link.href} variant="ghost" asChild className="text-foreground/90 hover:bg-primary/10 hover:text-primary transition-colors duration-300">
                 <Link href={link.href} className="text-md font-medium">{link.label}</Link>
               </Button>
             ))}
@@ -84,14 +78,13 @@ export function Header() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-[280px] sm:w-[320px] bg-sidebar text-sidebar-foreground p-6 flex flex-col">
-                <SheetHeader className="mb-6">
+                <SheetHeader className="mb-6 border-b border-sidebar-border pb-4">
                   <SheetTitle asChild>
                      <Link href="/" className="flex items-center space-x-2 text-primary hover:text-accent transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
                         <BookOpenText className="h-7 w-7" />
                         <span className="text-2xl font-headline font-bold">MuseBlog</span>
                       </Link>
                   </SheetTitle>
-                  {/* You can add a SheetDescription here if needed */}
                 </SheetHeader>
                 <nav className="flex flex-col space-y-3 flex-grow">
                   {currentNavLinks.map((link) => (
@@ -106,13 +99,12 @@ export function Header() {
                     </Button>
                   ))}
                 </nav>
-                {/* Example of how to toggle admin for demo, remove for production */}
                 <div className="mt-auto border-t border-sidebar-border pt-4">
-                  <Button onClick={() => setIsAdmin(!isAdmin)} variant="outline" className="w-full">
+                  <Button onClick={() => setIsAdmin(!isAdmin)} variant="outline" className="w-full border-sidebar-accent text-sidebar-accent hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
                     Toggle Admin View (Dev)
                   </Button>
                   <p className="text-xs text-muted-foreground mt-2">
-                    Note: Admin link visibility is currently mocked. In a real app, this would be based on user authentication and roles. By default, the 'Admin' link is hidden.
+                    Note: Admin link visibility is currently mocked.
                   </p>
                 </div>
               </SheetContent>

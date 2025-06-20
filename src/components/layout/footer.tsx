@@ -1,10 +1,11 @@
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Linkedin, Twitter, Mail } from 'lucide-react';
 
 export function Footer() {
   return (
-    <footer className="mt-auto bg-background/80 backdrop-blur-md border-t border-border/50">
+    <footer className="mt-auto bg-background/90 backdrop-blur-md border-t border-border/50"> {/* Updated for dark theme */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
           <div className="text-center md:text-left">

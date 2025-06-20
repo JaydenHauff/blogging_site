@@ -1,32 +1,50 @@
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import SectionTitle from '@/components/ui/section-title';
 import BlogPostCard from '@/components/blog/blog-post-card';
 import { NewsletterForm } from '@/components/forms/newsletter-form';
-import { MOCK_BLOG_POSTS, SITE_NAME, SITE_DESCRIPTION } from '@/lib/constants';
+import { MOCK_BLOG_POSTS, SITE_NAME, SITE_DESCRIPTION, MOCK_TEAM_MEMBERS } from '@/lib/constants';
 import TranslucentContainer from '@/components/ui/translucent-container';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Zap, Users, Edit3, BarChart3, BookOpenCheck, Lightbulb, MessageSquareHeart, Rocket } from 'lucide-react';
+import TeamMemberCard from '@/components/about/team-member-card'; // Re-using for author spotlight
+
+const featuredCategories = [
+  { name: 'Technology', icon: Zap, description: 'Latest in tech, AI, and gadgets.', slug: 'technology', hint: "circuit board" },
+  { name: 'Creative Writing', icon: Edit3, description: 'Tips, inspiration, and showcases.', slug: 'creative-writing', hint: "vintage typewriter" },
+  { name: 'Personal Growth', icon: BarChart3, description: 'Insights for a better you.', slug: 'personal-growth', hint: "mountain sunrise" },
+  { name: 'Book Reviews', icon: BookOpenCheck, description: 'Deep dives into compelling reads.', slug: 'book-reviews', hint: "books library" },
+];
+
+const whyMuseBlog = [
+  { title: "Inspiring Content", icon: Lightbulb, text: "Curated articles to spark your curiosity and creativity." },
+  { title: "Diverse Voices", icon: Users, text: "A platform for writers from all backgrounds to share their unique perspectives." },
+  { title: "Engaging Community", icon: MessageSquareHeart, text: "Connect with fellow readers and writers in a supportive environment." },
+  { title: "Modern Platform", icon: Rocket, text: "Enjoy a seamless reading experience on our beautifully designed site." },
+];
 
 export default function Home() {
   const recentPosts = MOCK_BLOG_POSTS.slice(0, 3);
+  const authorSpotlight = MOCK_TEAM_MEMBERS.length > 0 ? MOCK_TEAM_MEMBERS[0] : null;
 
   return (
     <div className="space-y-24 md:space-y-32 pb-16">
       {/* Hero Section */}
       <section 
         className="relative min-h-[calc(100vh-5rem)] flex items-center justify-center py-20 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('https://placehold.co/1920x1080.png')" }}
-        data-ai-hint="abstract creative background"
+        style={{ backgroundImage: "url('https://placehold.co/1920x1080.png')" }} /* Keep placeholder, but hint changes */
+        data-ai-hint="dark abstract technology" /* Updated hint for dark theme */
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-accent/30 backdrop-blur-sm"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-transparent to-accent/30 backdrop-blur-sm"></div>
         <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
           <TranslucentContainer 
             className="max-w-3xl mx-auto" 
             padding="p-8 md:p-12"
-            baseColor="white"
-            backgroundOpacity={10}
+            baseColor="background" /* Changed from white to background for dark theme */
+            backgroundOpacity={20} /* Adjusted opacity */
             blurStrength="md"
+            shadow="shadow-2xl"
           >
             <h1 className="text-5xl sm:text-6xl md:text-7xl font-headline font-extrabold mb-6 text-primary">
               Welcome to {SITE_NAME}
@@ -46,9 +64,9 @@ export default function Home() {
       {/* Recent Blog Posts Section */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-8">
         <SectionTitle title="Latest Musings" subtitle="Discover our most recent articles and dive into compelling stories." />
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-1 gap-8"> {/* Changed to single column for horizontal cards */}
           {recentPosts.map((post) => (
-            <BlogPostCard key={post.id} post={post} />
+            <BlogPostCard key={post.id} post={post} orientation="horizontal" />
           ))}
         </div>
         {MOCK_BLOG_POSTS.length > 3 && (
@@ -60,15 +78,76 @@ export default function Home() {
         )}
       </section>
 
+      {/* Featured Categories Section */}
+      <section className="py-16 md:py-24 bg-background/50"> {/* Subtle background difference */}
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <SectionTitle title="Explore Topics" subtitle="Dive into categories that pique your interest." />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {featuredCategories.map(category => (
+              <TranslucentContainer
+                key={category.slug}
+                baseColor="card"
+                backgroundOpacity={60}
+                padding="p-6"
+                className="text-center group hover:scale-105 transition-transform duration-300"
+                shadow="shadow-xl"
+                rounded="rounded-lg"
+              >
+                <Link href={`/blogs?category=${category.slug}`} className="flex flex-col items-center">
+                  <div className="p-4 bg-primary/20 rounded-full mb-4 group-hover:bg-primary/30 transition-colors">
+                    <category.icon className="h-10 w-10 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-headline font-semibold text-primary mb-2">{category.name}</h3>
+                  <p className="text-sm text-muted-foreground">{category.description}</p>
+                </Link>
+              </TranslucentContainer>
+            ))}
+          </div>
+        </div>
+      </section>
+      
+      {/* Why MuseBlog Section */}
+      <section className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <SectionTitle title={`Why ${SITE_NAME}?`} subtitle="Experience content that enlightens and connects." />
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {whyMuseBlog.map((item) => (
+            <TranslucentContainer 
+              key={item.title}
+              baseColor="card"
+              backgroundOpacity={70}
+              padding="p-6"
+              className="flex flex-col items-center text-center"
+            >
+              <item.icon className="h-12 w-12 text-accent mb-4" />
+              <h3 className="text-xl font-headline font-semibold text-primary mb-2">{item.title}</h3>
+              <p className="text-sm text-foreground/80">{item.text}</p>
+            </TranslucentContainer>
+          ))}
+        </div>
+      </section>
+
+      {/* Author Spotlight Section */}
+      {authorSpotlight && (
+        <section className="py-16 md:py-24 bg-secondary/30">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <SectionTitle title="Meet Our Voice" subtitle={`Get to know ${authorSpotlight.name}, one of the creative minds at ${SITE_NAME}.`} />
+            <div className="max-w-xl mx-auto">
+               <TeamMemberCard member={authorSpotlight} />
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Newsletter Subscription Section */}
       <section className="py-16 md:py-24 bg-gradient-to-r from-primary/5 to-accent/5">
          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <TranslucentContainer 
             className="max-w-2xl mx-auto"
             padding="p-8 md:p-12"
-            baseColor="background"
+            baseColor="card" /* Changed from background to card for better contrast in dark mode */
             backgroundOpacity={50}
             blurStrength="lg"
+            shadow="shadow-xl"
           >
             <SectionTitle
               title="Stay Inspired"
