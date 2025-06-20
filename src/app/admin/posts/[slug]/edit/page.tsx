@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useActionState, useRef, useEffect, useState, use, useCallback } from 'react'; // Added useCallback
+import { useActionState, useRef, useEffect, useState, use, useCallback } from 'react'; 
 import { useFormStatus } from 'react-dom';
 import { useRouter, notFound } from 'next/navigation';
 import { updateBlogPostAction } from '@/lib/actions';
@@ -68,7 +68,7 @@ export default function EditPostPage({ params: paramsAsProp }: EditPostPageProps
         variant: state.isError ? 'destructive' : 'default',
       });
       if (!state.isError && state.updatedPostSlug) {
-        router.push(`/blogs/${state.updatedPostSlug}`);
+        router.push(`/admin/posts`); // Redirect to posts list
       }
     }
   }, [state, toast, router]);
@@ -105,26 +105,25 @@ export default function EditPostPage({ params: paramsAsProp }: EditPostPageProps
 
   const handleEditorChange = useCallback((content: string) => {
     setEditorContent(content);
-  }, []); // Empty dependency array ensures stable function reference
+  }, []); 
 
   if (!post) {
-    return <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 text-center">Loading post data...</div>;
+    return <div className="text-center">Loading post data...</div>;
   }
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+    <>
       <SectionTitle title="Edit Blog Post" subtitle={`Editing: ${post.title}`} alignment="left" />
 
-      <Alert className="mb-8 bg-secondary/50">
+      <Alert className="mb-8 bg-secondary/50 border-secondary">
         <Terminal className="h-4 w-4" />
-        <AlertTitle>Admin Area & Rich Text Editor</AlertTitle>
+        <AlertTitle>Content Editor</AlertTitle>
         <AlertDescription>
-          You are editing an existing post. Ensure all admin functionalities are protected by authentication in production.
-          The Tiptap editor provides various formatting options.
+          You are editing an existing post. The Tiptap editor provides various formatting options.
         </AlertDescription>
       </Alert>
 
-      <TranslucentContainer baseColor="card" backgroundOpacity={80} padding="p-6 md:p-8">
+      <TranslucentContainer baseColor="card" backgroundOpacity={80} padding="p-6 md:p-8" shadow="shadow-xl" rounded="rounded-lg">
         <form ref={formRef} action={formAction} className="space-y-6">
           <input type="hidden" name="id" value={post.id} />
           <input type="hidden" name="content" value={editorContent} />
@@ -207,6 +206,6 @@ export default function EditPostPage({ params: paramsAsProp }: EditPostPageProps
           </div>
         </form>
       </TranslucentContainer>
-    </div>
+    </>
   );
 }

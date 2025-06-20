@@ -49,10 +49,10 @@ function DeletePostButton({ postId, postTitle }: { postId: string; postTitle: st
 }
 
 export default function ManagePostsPage() {
-  const posts: BlogPost[] = MOCK_BLOG_POSTS; // In a real app, fetch from API
+  const posts: BlogPost[] = MOCK_BLOG_POSTS; 
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+    <>
       <div className="flex justify-between items-center mb-8 md:mb-12">
         <SectionTitle 
           title="Manage Blog Posts" 
@@ -70,16 +70,18 @@ export default function ManagePostsPage() {
       {posts.length > 0 ? (
         <TranslucentContainer 
           baseColor="card" 
-          backgroundOpacity={70} 
-          padding="p-0" // Table will have its own padding
+          backgroundOpacity={80} 
+          padding="p-0" 
+          shadow="shadow-xl"
+          rounded="rounded-lg"
         >
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Title</TableHead>
-                <TableHead>Author</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Date</TableHead>
+                <TableHead className="hidden md:table-cell">Author</TableHead>
+                <TableHead className="hidden lg:table-cell">Category</TableHead>
+                <TableHead className="hidden md:table-cell">Date</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -87,9 +89,9 @@ export default function ManagePostsPage() {
               {posts.map((post) => (
                 <TableRow key={post.id}>
                   <TableCell className="font-medium">{post.title}</TableCell>
-                  <TableCell>{post.author}</TableCell>
-                  <TableCell>{post.category || 'N/A'}</TableCell>
-                  <TableCell>{new Date(post.date).toLocaleDateString()}</TableCell>
+                  <TableCell className="hidden md:table-cell">{post.author}</TableCell>
+                  <TableCell className="hidden lg:table-cell">{post.category || 'N/A'}</TableCell>
+                  <TableCell className="hidden md:table-cell">{new Date(post.date).toLocaleDateString()}</TableCell>
                   <TableCell className="text-right space-x-2">
                     <Button variant="outline" size="sm" asChild>
                       <Link href={`/admin/posts/${post.slug}/edit`}>
@@ -109,6 +111,8 @@ export default function ManagePostsPage() {
             backgroundOpacity={70} 
             padding="p-8 md:p-10"
             className="text-center"
+            shadow="shadow-xl"
+            rounded="rounded-lg"
           >
             <p className="text-lg text-foreground/80">No blog posts found. Get started by creating one!</p>
          </TranslucentContainer>
@@ -117,6 +121,6 @@ export default function ManagePostsPage() {
           <strong>Note:</strong> "Delete" actions are simulated (logged to console) and do not persistently alter the mock post list on page reload.
           A real backend database is required for persistent post management.
       </div>
-    </div>
+    </>
   );
 }

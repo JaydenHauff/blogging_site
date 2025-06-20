@@ -19,20 +19,16 @@ const navLinksBase = [
   { href: '/blogs', label: 'Blogs' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact Us' },
+  { href: '/admin/dashboard', label: 'Admin Panel' }, // Admin link always visible
 ];
 
-const adminLink = { href: '/admin/dashboard', label: 'Admin' };
-
 export function Header() {
-  const [isAdmin, setIsAdmin] = useState(true); 
   const [isMounted, setIsMounted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
-
-  const currentNavLinks = isAdmin ? [...navLinksBase, adminLink] : navLinksBase;
 
   // Basic header structure for SSR/initial mount to avoid hydration mismatch
   const ssrHeader = (
@@ -58,7 +54,7 @@ export function Header() {
   }
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out bg-background/80 backdrop-blur-lg shadow-md"> {/* Adjusted opacity for light theme */}
+    <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out bg-background/80 backdrop-blur-lg shadow-md">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           <Link href="/" className="flex items-center space-x-2 text-primary hover:text-accent transition-colors">
@@ -66,7 +62,7 @@ export function Header() {
             <span className="text-3xl font-headline font-bold">MuseBlog</span>
           </Link>
           <nav className="hidden md:flex space-x-1">
-            {currentNavLinks.map((link) => (
+            {navLinksBase.map((link) => (
               <Button key={link.href} variant="ghost" asChild className="text-foreground/90 hover:bg-primary/10 hover:text-primary transition-colors duration-300">
                 <Link href={link.href} className="text-md font-medium">{link.label}</Link>
               </Button>
@@ -89,7 +85,7 @@ export function Header() {
                   </SheetTitle>
                 </SheetHeader>
                 <nav className="flex flex-col space-y-3 flex-grow">
-                  {currentNavLinks.map((link) => (
+                  {navLinksBase.map((link) => (
                     <Button
                       key={link.href}
                       variant="ghost"
@@ -101,14 +97,7 @@ export function Header() {
                     </Button>
                   ))}
                 </nav>
-                <div className="mt-auto border-t border-sidebar-border pt-4">
-                  <Button onClick={() => setIsAdmin(!isAdmin)} variant="outline" className="w-full border-sidebar-accent text-sidebar-accent hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
-                    Toggle Admin View (Dev)
-                  </Button>
-                  <p className="text-xs text-muted-foreground mt-2 text-center">
-                    Note: Admin link visibility is mocked for development.
-                  </p>
-                </div>
+                {/* Removed the dev-only toggle button for admin view */}
               </SheetContent>
             </Sheet>
           </div>

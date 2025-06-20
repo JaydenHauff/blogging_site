@@ -49,7 +49,7 @@ export default function ManageCategoriesPage() {
   const categories = Array.from(new Set(MOCK_BLOG_POSTS.map(p => p.category).filter(Boolean))) as string[];
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+    <>
       <SectionTitle 
         title="Manage Categories" 
         subtitle={`Found ${categories.length} unique categories from blog posts.`}
@@ -61,9 +61,11 @@ export default function ManageCategoriesPage() {
             <TranslucentContainer 
               key={category}
               baseColor="card" 
-              backgroundOpacity={70} 
+              backgroundOpacity={80} 
               padding="p-6"
               className="flex flex-col justify-between"
+              shadow="shadow-lg"
+              rounded="rounded-lg"
             >
               <div>
                 <div className="flex items-center mb-3">
@@ -71,7 +73,6 @@ export default function ManageCategoriesPage() {
                   <h3 className="text-xl font-semibold text-primary truncate">{category}</h3>
                 </div>
                 <p className="text-sm text-muted-foreground mb-4">
-                  {/* You could count posts in this category here */}
                   {MOCK_BLOG_POSTS.filter(p => p.category === category).length} post(s)
                 </p>
               </div>
@@ -87,6 +88,8 @@ export default function ManageCategoriesPage() {
             backgroundOpacity={70} 
             padding="p-8 md:p-10"
             className="text-center"
+            shadow="shadow-xl"
+            rounded="rounded-lg"
           >
           <p className="text-lg text-foreground/80">No categories found in blog posts.</p>
         </TranslucentContainer>
@@ -95,6 +98,6 @@ export default function ManageCategoriesPage() {
           <strong>Note:</strong> "Delete" actions for categories are simulated (logged to console) and do not persistently alter data or remove posts from this category.
           A real backend database is required for robust category management.
       </div>
-    </div>
+    </>
   );
 }

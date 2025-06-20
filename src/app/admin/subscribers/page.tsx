@@ -45,7 +45,7 @@ export default function ManageSubscribersPage() {
   const subscribers = MOCK_SUBSCRIBERS;
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+    <>
       <SectionTitle 
         title="Manage Subscribers" 
         subtitle={`View and manage newsletter subscribers. Currently showing ${subscribers.length} mock subscriber(s).`}
@@ -54,14 +54,16 @@ export default function ManageSubscribersPage() {
       {subscribers.length > 0 ? (
         <TranslucentContainer 
           baseColor="card" 
-          backgroundOpacity={70} 
-          padding="p-0" // Table will have its own padding
+          backgroundOpacity={80} 
+          padding="p-0" 
+          shadow="shadow-xl"
+          rounded="rounded-lg"
         >
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Email</TableHead>
-                <TableHead>Subscribed At</TableHead>
+                <TableHead className="hidden md:table-cell">Subscribed At</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -69,7 +71,7 @@ export default function ManageSubscribersPage() {
               {subscribers.map((subscriber) => (
                 <TableRow key={subscriber.id}>
                   <TableCell className="font-medium">{subscriber.email}</TableCell>
-                  <TableCell>{new Date(subscriber.subscribedAt).toLocaleDateString()}</TableCell>
+                  <TableCell className="hidden md:table-cell">{new Date(subscriber.subscribedAt).toLocaleDateString()}</TableCell>
                   <TableCell className="text-right">
                     <RemoveButton subscriberId={subscriber.id} subscriberEmail={subscriber.email} />
                   </TableCell>
@@ -84,6 +86,8 @@ export default function ManageSubscribersPage() {
             backgroundOpacity={70} 
             padding="p-8 md:p-10"
             className="text-center"
+            shadow="shadow-xl"
+            rounded="rounded-lg"
           >
           <p className="text-lg text-foreground/80">No subscribers found.</p>
         </TranslucentContainer>
@@ -94,6 +98,6 @@ export default function ManageSubscribersPage() {
           "Remove" actions are simulated (logged to console) and do not persistently alter this mock list on page reload.
           A real backend database is required for persistent subscriber management.
         </div>
-    </div>
+    </>
   );
 }

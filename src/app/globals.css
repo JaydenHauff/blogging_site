@@ -87,10 +87,8 @@ body {
 /* Tiptap Editor Styles for Light Theme */
 .ProseMirror {
   outline: none;
-  /* Base structural styles are applied by the .tiptap class on the parent of EditorContent */
 }
 
-/* Tiptap Placeholder - Relies on Placeholder extension (default in StarterKit) */
 .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   float: left;
@@ -106,17 +104,15 @@ body {
 .tiptap-toolbar > button svg {
   @apply h-5 w-5; 
 }
-.tiptap-toolbar > button div { /* For color swatch buttons */
+.tiptap-toolbar > button div { 
     @apply h-4 w-4 rounded-sm border border-foreground/20;
 }
 
-/* Styles for the Tiptap editor's content area container (applied to editorProps.attributes.class) */
 .tiptap {
   @apply p-4 min-h-[300px] bg-transparent text-foreground focus:outline-none;
-  /* Typography (prose classes) are applied directly in editorProps in rich-text-editor.tsx */
+  /* Typography is applied directly by prose classes in rich-text-editor.tsx editorProps */
 }
 
-/* Default margins for elements within Tiptap, if needed beyond what 'prose' provides */
 .tiptap > *:first-child {
   margin-top: 0;
 }
@@ -124,23 +120,34 @@ body {
   margin-bottom: 0;
 }
 
-/* Ensure images inserted into Tiptap are responsive and styled */
 .tiptap img {
   /* Default styling applied by ImageExtension's HTMLAttributes in rich-text-editor.tsx */
-  /* Example: class: 'max-w-full h-auto rounded-md border my-4 mx-auto block' */
-  /* You can add additional global image styles here if needed, but prefer configuring via extension */
 }
 
-/* Styling for highlighted text (if using Highlight extension) */
 .tiptap mark {
-  background-color: #FFF3A3; /* Default yellow, can be overridden by specific highlight color */
+  background-color: #FFF3A3; 
   padding: 0.1em 0.2em;
   border-radius: 0.2em;
 }
 
-/* Text alignment classes that Tiptap might apply */
 .tiptap .text-left { text-align: left; }
 .tiptap .text-center { text-align: center; }
 .tiptap .text-right { text-align: right; }
 .tiptap .text-justify { text-align: justify; }
 
+
+/* Sidebar specific scrollbar styling if needed */
+[data-sidebar="content"]::-webkit-scrollbar {
+  width: 6px;
+}
+[data-sidebar="content"]::-webkit-scrollbar-track {
+  background: hsl(var(--sidebar-background));
+  border-radius: 10px;
+}
+[data-sidebar="content"]::-webkit-scrollbar-thumb {
+  background: hsl(var(--sidebar-border));
+  border-radius: 10px;
+}
+[data-sidebar="content"]::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--sidebar-accent));
+}

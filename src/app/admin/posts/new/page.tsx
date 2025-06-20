@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useActionState, useRef, useEffect, useState, useCallback } from 'react'; // Added useCallback
+import { useActionState, useRef, useEffect, useState, useCallback } from 'react';
 import { useFormStatus } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { createBlogPostAction } from '@/lib/actions';
@@ -50,7 +50,7 @@ export default function CreatePostPage() {
         setImageUrlInput('');
         setEditorContent(''); 
         if (state.newPostSlug) {
-          router.push('/admin/dashboard'); 
+          router.push('/admin/posts'); // Redirect to posts list
         }
       }
     }
@@ -88,23 +88,21 @@ export default function CreatePostPage() {
 
   const handleEditorChange = useCallback((content: string) => {
     setEditorContent(content);
-  }, []); // Empty dependency array ensures stable function reference
+  }, []);
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+    <>
       <SectionTitle title="Create New Blog Post" subtitle="Craft your next masterpiece for MuseBlog." alignment="left" />
 
-      <Alert className="mb-8 bg-secondary/50">
+      <Alert className="mb-8 bg-secondary/50 border-secondary">
         <Terminal className="h-4 w-4" />
-        <AlertTitle>Admin Area & Rich Text Editor</AlertTitle>
+        <AlertTitle>Content Editor</AlertTitle>
         <AlertDescription>
-          Ensure this page and all admin functionalities are protected by authentication in production.
-          <br />
-          The Tiptap rich text editor below provides various formatting options, including image insertion via URL.
+          Utilize the Tiptap rich text editor below for formatting your post. Ensure all content is saved before navigating away.
         </AlertDescription>
       </Alert>
 
-      <TranslucentContainer baseColor="card" backgroundOpacity={80} padding="p-6 md:p-8">
+      <TranslucentContainer baseColor="card" backgroundOpacity={80} padding="p-6 md:p-8" shadow="shadow-xl" rounded="rounded-lg">
         <form ref={formRef} action={formAction} className="space-y-6">
           <input type="hidden" name="content" value={editorContent} />
           <input type="hidden" name="imageDataUri" value={imageDataUri || ''} />
@@ -186,6 +184,6 @@ export default function CreatePostPage() {
           </div>
         </form>
       </TranslucentContainer>
-    </div>
+    </>
   );
 }
