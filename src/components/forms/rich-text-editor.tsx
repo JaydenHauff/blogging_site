@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import type QuillType from 'quill';
+// ReactQuill and its CSS will be dynamically imported or CSS imported globally.
 
 interface RichTextEditorProps {
   value?: string;
@@ -12,9 +12,7 @@ interface RichTextEditorProps {
 
 // Dynamically import ReactQuill to ensure it's only loaded on the client-side
 const ReactQuill = typeof window === 'object' ? require('react-quill') : () => null;
-if (typeof window === 'object') {
-  require('react-quill/dist/quill.snow.css'); // Import Quill styles
-}
+// CSS is now imported globally in globals.css
 
 
 const modules = {
@@ -36,10 +34,6 @@ const modules = {
 
     ['clean']                                         // remove formatting button
   ],
-  // imageResize: { // Optional: if you want image resizing
-  //   parchment: QuillType.import('parchment'),
-  //   modules: ['Resize', 'DisplaySize']
-  // }
 };
 
 const formats = [
@@ -67,7 +61,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
     onEditorChange(html);
   };
 
-  if (typeof window !== 'object') {
+  if (typeof window !== 'object' || !ReactQuill) {
     // Return a placeholder or null during SSR or if window is not available
     return <div className="h-[300px] w-full rounded-md border border-input bg-muted animate-pulse" />;
   }
@@ -81,7 +75,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
         modules={modules}
         formats={formats}
         placeholder={placeholder || "Start writing..."}
-        className="quill-editor-container" // Custom class for potential global styling
+        className="quill-editor-container" // Custom class for global styling
       />
     </div>
   );

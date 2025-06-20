@@ -1,4 +1,6 @@
 
+@import 'react-quill/dist/quill.snow.css'; /* Import Quill styles */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,52 +12,52 @@ body {
 @layer base {
   :root {
     /* Elegant & Airy Light Theme */
-    --background: 220 60% 98%; /* Very Light Cool Gray */
-    --foreground: 220 25% 25%; /* Dark Slate Blue */
+    --background: 276 100% 99%; /* #fcfaff - Light grayish-violet (background color) */
+    --foreground: 274 23% 30%; /* #413b51 - Dark muted violet for text */
 
-    --card: 0 0% 100%;       /* Pure White */
-    --card-foreground: 220 25% 30%;
+    --card: 276 100% 100%; /* #ffffff - Pure White for cards */
+    --card-foreground: 274 23% 25%; /* #3a344a - Slightly darker for card text */
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 25% 30%;
+    --popover: 276 100% 100%; /* #ffffff */
+    --popover-foreground: 274 23% 25%; /* #3a344a */
 
-    --primary: 205 70% 50%; /* Clear, Refined Blue */
-    --primary-foreground: 0 0% 100%; /* White */
+    --primary: 274 42% 64%; /* #9F82C6 - Muted violet (primary color) */
+    --primary-foreground: 0 0% 100%; /* #ffffff - White for text on primary */
 
-    --secondary: 210 40% 92%; /* Light Grayish Blue */
-    --secondary-foreground: 220 25% 35%;
+    --secondary: 276 25% 90%; /* #e2dfe7 - Lighter, desaturated violet for secondary elements */
+    --secondary-foreground: 274 30% 40%; /* #584c6f - Readable text on secondary */
 
-    --muted: 210 40% 95%;   /* Very Light Gray */
-    --muted-foreground: 210 20% 55%; /* Soft Gray */
+    --muted: 276 20% 94%;   /* #f0eef3 - Very light violet-gray for muted elements */
+    --muted-foreground: 274 15% 55%; /* #827c8f - Softer text for muted foreground */
 
-    --accent: 38 90% 60%;   /* Soft Gold/Peach */
-    --accent-foreground: 20 40% 20%; /* Dark Brown for contrast on accent */
+    --accent: 274 30% 47%;   /* #6D5496 - Soft purple (accent color) */
+    --accent-foreground: 0 0% 100%; /* #ffffff - White for text on accent */
 
-    --destructive: 0 70% 55%;  /* Balanced Red */
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 70% 60%;  /* #e54c4c - A balanced red for destructive actions */
+    --destructive-foreground: 0 0% 100%; /* #ffffff */
 
-    --border: 210 30% 88%;   /* Light Gray Border */
-    --input: 210 40% 96%;    /* Slightly off-white input */
-    --ring: 205 70% 55%;     /* Primary color for rings */
+    --border: 276 20% 88%;   /* #e0dce3 - Light violet-gray border */
+    --input: 276 30% 95%;    /* #f3f0f7 - Slightly off-white input, harmonizing with violet */
+    --ring: 274 42% 70%;     /* #ad96d3 - Lighter primary for rings */
 
     --radius: 0.5rem;
 
-    /* Chart colors for light theme */
-    --chart-1: 205 60% 50%;
-    --chart-2: 38 80% 55%;
-    --chart-3: 170 50% 50%;
-    --chart-4: 260 60% 65%;
-    --chart-5: 150 55% 50%;
+    /* Chart colors for light theme - harmonizing with violets */
+    --chart-1: 274 40% 60%; /* Primary variant */
+    --chart-2: 274 30% 50%; /* Accent variant */
+    --chart-3: 260 50% 65%; /* A contrasting blue-violet */
+    --chart-4: 300 40% 70%; /* A pinkish-violet */
+    --chart-5: 240 40% 65%; /* A softer blue */
 
     /* Sidebar - Light Theme */
-    --sidebar-background: 220 50% 96%;
-    --sidebar-foreground: 220 25% 30%;
-    --sidebar-primary: 205 70% 50%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 38 90% 60%;
-    --sidebar-accent-foreground: 20 40% 20%;
-    --sidebar-border: 210 30% 85%;
-    --sidebar-ring: 205 70% 55%;
+    --sidebar-background: 276 60% 97%; /* #f7f5fa - Very light violet-gray */
+    --sidebar-foreground: 274 25% 35%; /* #4b435c */
+    --sidebar-primary: 274 42% 64%; /* #9F82C6 */
+    --sidebar-primary-foreground: 0 0% 100%; /* #ffffff */
+    --sidebar-accent: 274 30% 47%; /* #6D5496 */
+    --sidebar-accent-foreground: 0 0% 100%; /* #ffffff */
+    --sidebar-border: 276 30% 90%; /* #e7e3eb */
+    --sidebar-ring: 274 42% 70%; /* #ad96d3 */
   }
 }
 
@@ -77,10 +79,10 @@ body {
     @apply bg-black/5 backdrop-blur-sm shadow-lg;
   }
    .font-headline {
-    font-family: var(--font-headline), serif;
+    font-family: var(--font-belleza), serif; /* Updated to use CSS var */
   }
   .font-body {
-    font-family: var(--font-body), serif;
+    font-family: var(--font-alegreya), serif; /* Updated to use CSS var */
   }
 }
 
