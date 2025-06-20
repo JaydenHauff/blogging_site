@@ -30,7 +30,7 @@ const BlogPostCard: React.FC<BlogPostCardProps> = ({ post, orientation = 'horizo
         className={cn("overflow-hidden h-full flex flex-col group border border-border/40", className)}
       >
         {post.imageUrl && (
-          <div className="relative w-full h-56 overflow-hidden">
+          <div className="relative w-full aspect-square overflow-hidden"> {/* Changed h-56 to aspect-square */}
             <Image
               src={post.imageUrl}
               alt={post.title}
