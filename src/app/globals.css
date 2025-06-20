@@ -123,9 +123,9 @@ body {
 
 /* Ensure prose styles apply within Quill content if needed, or style directly */
 .quill-editor-container .ql-editor {
-  /* Prose classes are adapted by Tailwind for dark mode if correctly configured */
   @apply prose prose-invert max-w-none prose-headings:font-headline prose-headings:text-primary prose-a:text-accent hover:prose-a:text-primary prose-strong:text-foreground/90 prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground prose-code:bg-muted prose-code:text-foreground prose-code:p-1 prose-code:rounded-sm prose-pre:bg-muted prose-pre:text-foreground prose-pre:p-4 prose-pre:rounded-md;
   padding: 1rem; /* Add padding to the editor area */
+  color: hsl(var(--foreground)); /* Explicitly set default text color */
 }
 
 .quill-editor-container .ql-editor.ql-blank::before{
@@ -134,6 +134,8 @@ body {
   position: absolute;
   left: 1rem; /* Corresponds to .ql-editor padding */
   right: 1rem;
+  top: 1rem; /* Ensure placeholder is positioned within padding */
+  pointer-events: none; /* Prevent placeholder from interfering with clicks */
 }
 
 
@@ -152,5 +154,3 @@ body {
 [data-sidebar="content"]::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--sidebar-accent));
 }
-
-    
