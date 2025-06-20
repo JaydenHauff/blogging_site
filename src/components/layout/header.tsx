@@ -4,8 +4,8 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { BookOpenText, PanelLeft } from 'lucide-react'; 
-import { cn } from '@/lib/utils';
-import React, { useState, useEffect } from 'react'; 
+// Removed cn import as it's not used directly in this simplified version
+import React, { useState } from 'react'; 
 import {
   Sheet,
   SheetContent,
@@ -19,39 +19,14 @@ const navLinksBase = [
   { href: '/blogs', label: 'Blogs' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact Us' },
-  { href: '/admin/dashboard', label: 'Admin Panel' }, // Admin link always visible
+  { href: '/admin/dashboard', label: 'Admin Panel' },
 ];
 
 export function Header() {
-  const [isMounted, setIsMounted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  // Basic header structure for SSR/initial mount to avoid hydration mismatch
-  const ssrHeader = (
-    <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out bg-background border-b border-border shadow-sm">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          <Link href="/" className="flex items-center space-x-2 text-primary hover:text-accent transition-colors">
-            <BookOpenText className="h-8 w-8" />
-            <span className="text-3xl font-headline font-bold">MuseBlog</span>
-          </Link>
-          <div className="md:hidden">
-            <Button variant="ghost" size="icon" aria-label="Open menu">
-              <PanelLeft className="h-6 w-6" />
-            </Button>
-          </div>
-        </div>
-      </div>
-    </header>
-  );
-
-  if (!isMounted) {
-    return ssrHeader;
-  }
+  // Removed isMounted state and useEffect for isMounted to fix hydration error.
+  // The component will now render its full structure on both server and client initially.
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out bg-background border-b border-border shadow-sm">
@@ -97,7 +72,6 @@ export function Header() {
                     </Button>
                   ))}
                 </nav>
-                {/* Removed the dev-only toggle button for admin view */}
               </SheetContent>
             </Sheet>
           </div>
