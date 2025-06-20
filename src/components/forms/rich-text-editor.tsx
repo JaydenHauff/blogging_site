@@ -133,20 +133,18 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
       StarterKit.configure({
         heading: { levels: [1, 2, 3] },
         codeBlock: { languageClassPrefix: 'language-' },
-        // Disable default History extension to use explicit Undo/Redo buttons
-        history: false, 
       }),
       Underline,
       ImageExtension.configure({
-        inline: false, // Allows images to be on their own line or styled with more flexibility
+        inline: false, 
         HTMLAttributes: {
-          class: 'max-w-full h-auto rounded-md border my-4', // Basic styling for inserted images
+          class: 'max-w-full h-auto rounded-md border my-4', 
         },
       }),
       TextAlign.configure({
         types: ['heading', 'paragraph'],
       }),
-      TextStyle, // Required for Color extension
+      TextStyle, 
       Color,
       Highlight.configure({ multicolor: true }),
       Superscript,
