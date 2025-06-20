@@ -123,7 +123,9 @@ export default function Home() {
               baseColor="card"
               backgroundOpacity={95} 
               padding="p-6"
-              className="flex flex-col items-center text-center"
+              className="flex flex-col items-center text-center hover:scale-105 transition-transform duration-300"
+              shadow="shadow-xl"
+              rounded="rounded-lg"
             >
               <item.icon className="h-12 w-12 text-accent mb-4" />
               <h3 className="text-xl font-headline font-semibold text-primary mb-2">{item.title}</h3>
