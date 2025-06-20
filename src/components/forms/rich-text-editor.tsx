@@ -32,7 +32,7 @@ const MenuBar: React.FC<{ editor: Editor | null }> = ({ editor }) => {
   const addImage = useCallback(() => {
     if (!editor || editor.isDestroyed || !editor.isEditable) return;
 
-    editor.chain().focus().run();
+    editor.chain().focus().run(); // Ensure focus before prompt
 
     const url = window.prompt('Enter image URL:');
 
@@ -46,14 +46,14 @@ const MenuBar: React.FC<{ editor: Editor | null }> = ({ editor }) => {
     { name: 'Red', value: '#e60000' },
     { name: 'Blue', value: '#0073e6' },
     { name: 'Green', value: '#008a00' },
-    { name: 'Primary', value: 'hsl(var(--primary))' },
+    { name: 'Primary', value: 'hsl(var(--primary))' }, // Using CSS variable
   ], []);
 
   const commonHighlights = useMemo(() => [
-    { name: 'Yellow', value: '#FFF3A3' },
+    { name: 'Yellow', value: '#FFF3A3' }, // Standard yellow highlight
     { name: 'Light Blue', value: '#ADD8E6' },
     { name: 'Light Green', value: '#90EE90' },
-    { name: 'None', value: ''}
+    { name: 'None', value: ''} // To remove highlight
   ], []);
 
   const menuItems = useMemo(() => {
@@ -91,13 +91,13 @@ const MenuBar: React.FC<{ editor: Editor | null }> = ({ editor }) => {
       { ...createAction(chain => chain.toggleBulletList(), () => editor.isActive('bulletList')), icon: List, label: 'Bullet List', type: "button" },
       { ...createAction(chain => chain.toggleOrderedList(), () => editor.isActive('orderedList')), icon: ListOrdered, label: 'Ordered List', type: "button" },
       { ...createAction(chain => chain.toggleCodeBlock(), () => editor.isActive('codeBlock')), icon: Code2, label: 'Code Block', type: "button" },
-      { action: addImage, icon: ImageIcon, label: 'Add Image', isActive: false, type: "button" },
+      { action: addImage, icon: ImageIcon, label: 'Add Image', isActive: false, type: "button" }, // isActive false for action buttons
       { ...createAction(chain => chain.setHorizontalRule()), icon: Minus, label: 'Horizontal Rule', type: "button" },
       { type: 'divider' as const },
       { ...createAction(chain => chain.unsetColor(), () => editor.isActive('textStyle') && !editor.getAttributes('textStyle').color), icon: Palette, label: 'Default Text Color', type: "button" },
       ...commonColors.map(color => ({
         ...createAction(chain => chain.setColor(color.value), () => editor.isActive('textStyle', { color: color.value })),
-        icon: () => <div style={{ backgroundColor: color.value }} title={`Set text to ${color.name}`} />,
+        icon: () => <div style={{ backgroundColor: color.value }} title={`Set text to ${color.name}`} />, // Custom icon: a colored square
         label: `Set text to ${color.name}`,
         type: "button" as const
       })),
@@ -105,7 +105,7 @@ const MenuBar: React.FC<{ editor: Editor | null }> = ({ editor }) => {
       { ...createAction(chain => chain.unsetHighlight(), () => !editor.isActive('highlight') || editor.isActive('highlight', {color: ''})), icon: Highlighter, label: 'No Highlight', type: "button"},
       ...commonHighlights.map(color => ({
         ...createAction(chain => chain.toggleHighlight({ color: color.value }), () => editor.isActive('highlight', { color: color.value })),
-        icon: () => <div style={{ backgroundColor: color.value }} title={`Highlight ${color.name}`} />,
+        icon: () => <div style={{ backgroundColor: color.value }} title={`Highlight ${color.name}`} />, // Custom icon
         label: `Highlight ${color.name}`,
         type: "button" as const
       })),
@@ -115,6 +115,10 @@ const MenuBar: React.FC<{ editor: Editor | null }> = ({ editor }) => {
       { ...createAction(chain => chain.unsetAllMarks().clearNodes()), icon: Eraser, label: 'Clear Formatting', type: "button" },
     ];
   }, [editor, addImage, commonColors, commonHighlights]);
+
+  if (!editor) {
+    return null;
+  }
 
   return (
     <div className="tiptap-toolbar">
@@ -130,7 +134,7 @@ const MenuBar: React.FC<{ editor: Editor | null }> = ({ editor }) => {
             variant={item.isActive ? 'secondary' : 'ghost'}
             size="sm"
             onClick={item.action}
-            disabled={'disabled' in item ? item.disabled : (editor && !editor.isDestroyed ? !editor.isEditable : true)}
+            disabled={'disabled' in item ? item.disabled : !editor.isEditable}
             aria-label={item.label}
             title={item.label}
             className="p-2"
@@ -147,22 +151,28 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
+        // heading: { levels: [1, 2, 3] }, // Default is 1-6, specific levels can be set if needed
+        // codeBlock: {}, // Basic code block
+        // blockquote: {},
+        // bulletList: {},
+        // orderedList: {},
+        // horizontalRule: {},
         placeholder: {
             placeholder: placeholder || "Start writing...",
         }
       }),
       Underline,
       ImageExtension.configure({
-        inline: false,
+        inline: false, // Block image
         allowBase64: true,
         HTMLAttributes: {
-          class: 'max-w-full h-auto rounded-md border my-4 mx-auto block',
+          class: 'max-w-full h-auto rounded-md border my-4 mx-auto block', // Responsive and styled
         },
       }),
       TextAlign.configure({
-        types: ['heading', 'paragraph', 'image'],
+        types: ['heading', 'paragraph', 'image'], // Allow alignment for images too
       }),
-      TextStyle,
+      TextStyle, // Required for Color
       Color,
       Highlight.configure({ multicolor: true }),
       Superscript,
@@ -170,12 +180,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
     ],
     content: value || '',
     onUpdate: ({ editor: currentEditor }) => {
+      // Prevent updates if editor is destroyed
       if (!currentEditor.isDestroyed) {
         onEditorChange(currentEditor.getHTML());
       }
     },
     editorProps: {
       attributes: {
+        // Apply prose styles for rich text formatting for light theme
         class: 'tiptap prose max-w-none prose-headings:font-headline prose-headings:text-primary prose-a:text-accent hover:prose-a:text-primary prose-strong:text-foreground/90 prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground prose-code:bg-muted prose-code:text-foreground prose-code:p-1 prose-code:rounded-sm prose-pre:bg-muted prose-pre:text-foreground prose-pre:p-4 prose-pre:rounded-md',
       },
     },
@@ -183,14 +195,16 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
 
   useEffect(() => {
     if (editor && !editor.isDestroyed && value !== null && value !== undefined) {
+      // Only set content if it's different to avoid potential cursor jumps or infinite loops
       if (value !== editor.getHTML()) {
-        editor.commands.setContent(value, false);
+        editor.commands.setContent(value, false); // false to avoid emitting update
         // Focus the editor after setting content, especially important for edit pages
         editor.commands.focus('end'); 
       }
     }
   }, [value, editor]);
 
+  // Ensure editor is destroyed on component unmount
   useEffect(() => {
     return () => {
       if (editor && !editor.isDestroyed) {
@@ -208,4 +222,3 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
 };
 
 export default RichTextEditor;
-

@@ -101,10 +101,11 @@ body {
   @apply flex flex-wrap items-center gap-1 p-2 border-b border-input bg-card rounded-t-md;
 }
 
+/* Ensure Lucide icons and custom color swatch divs in toolbar are sized correctly */
 .tiptap-toolbar > button svg {
-  @apply h-5 w-5; 
+  @apply h-5 w-5; /* Standard size for Lucide icons */
 }
-.tiptap-toolbar > button div { 
+.tiptap-toolbar > button div { /* For custom color swatches */
     @apply h-4 w-4 rounded-sm border border-foreground/20;
 }
 
@@ -122,14 +123,17 @@ body {
 
 .tiptap img {
   /* Default styling applied by ImageExtension's HTMLAttributes in rich-text-editor.tsx */
+  /* e.g., class: 'max-w-full h-auto rounded-md border my-4 mx-auto block' */
 }
 
+/* Highlight styling example (Tiptap uses <mark>) */
 .tiptap mark {
-  background-color: #FFF3A3; 
+  /* background-color: #FFF3A3; Default yellow from Tiptap highlight extension if no color is set */
   padding: 0.1em 0.2em;
   border-radius: 0.2em;
 }
 
+/* Text alignment classes that Tiptap might apply if configured */
 .tiptap .text-left { text-align: left; }
 .tiptap .text-center { text-align: center; }
 .tiptap .text-right { text-align: right; }
@@ -151,3 +155,4 @@ body {
 [data-sidebar="content"]::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--sidebar-accent));
 }
+
