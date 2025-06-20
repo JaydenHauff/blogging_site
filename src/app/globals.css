@@ -110,7 +110,7 @@ body {
 }
 
 .tiptap {
-  @apply p-4 min-h-[300px] bg-transparent text-foreground focus:outline-none;
+  @apply p-4 min-h-[300px] bg-muted/30 text-foreground focus:outline-none; /* Changed background for differentiation */
   /* Typography is applied directly by prose classes in rich-text-editor.tsx editorProps */
 }
 
