@@ -182,6 +182,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
         codeBlock: { languageClassPrefix: 'language-' },
         blockquote: true, 
         horizontalRule: true, // Enabled in StarterKit
+        history: true, // For Undo/Redo
       }),
       Underline,
       ImageExtension, // Allows for images
