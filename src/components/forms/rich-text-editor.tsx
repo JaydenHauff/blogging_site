@@ -12,6 +12,7 @@ import { Color } from '@tiptap/extension-color';
 import Highlight from '@tiptap/extension-highlight';
 import Subscript from '@tiptap/extension-subscript';
 import Superscript from '@tiptap/extension-superscript';
+import Placeholder from '@tiptap/extension-placeholder';
 
 import {
   Bold, Italic, Strikethrough, Code, Pilcrow, Heading1, Heading2, Heading3,
@@ -41,50 +42,43 @@ const MenuBar: React.FC<{ editor: Editor | null }> = ({ editor }) => {
     { name: 'Yellow', value: '#FFF3A3' },
     { name: 'Light Blue', value: '#ADD8E6' },
     { name: 'Light Green', value: '#90EE90' },
-    { name: 'None', value: ''} // Tiptap uses empty string for unset
+    { name: 'None', value: ''}
   ], []);
   
   const addImage = useCallback(() => {
     if (!editor || editor.isDestroyed || !editor.isEditable) {
-      console.error("addImage: Editor not available or not editable.");
       return;
     }
-    editor.view.focus(); // Direct DOM focus
-    editor.chain().focus().run(); // ProseMirror focus
-
+    editor.view.focus(); 
     const url = window.prompt('Enter image URL:');
     if (url && url.trim() !== '') {
-      editor.view.focus(); // Direct DOM focus again
       editor.chain().focus().setImage({ src: url.trim(), alt: 'User provided image' }).run();
     }
   }, [editor]);
 
-
-  const menuItems = useMemo(() => {
-    if (!editor) return [];
-
-    const createAction = (
-      commandCallback: (chain: ReturnType<Editor['chain']>) => ReturnType<Editor['chain']>,
-      isActiveCheck?: () => boolean | undefined,
-      canExecuteCheck?: () => boolean | undefined
-    ) => {
-      const isActuallyEditable = editor && !editor.isDestroyed && editor.isEditable;
-      const specificCommandCanExecute = isActuallyEditable && (canExecuteCheck ? canExecuteCheck() : true);
-      const isDisabled = !isActuallyEditable || !specificCommandCanExecute;
-
-      return {
-        action: () => {
-          if (isActuallyEditable && specificCommandCanExecute) {
-            editor.view.focus(); // Direct DOM focus
-            commandCallback(editor.chain().focus()).run();
-          }
-        },
-        isActive: isActuallyEditable && isActiveCheck ? isActiveCheck() : false,
-        disabled: isDisabled,
-        type: "button" as const,
-      };
-    };
+  const createAction = useCallback((
+    commandCallback: (chain: ReturnType<Editor['chain']>) => ReturnType<Editor['chain']>,
+    isActiveCheck?: () => boolean | undefined,
+    canExecuteCheck?: () => boolean | undefined
+  ) => {
+    const isEditorReadyAndEditable = editor && !editor.isDestroyed && editor.isEditable;
     
+    return {
+      action: () => {
+        if (isEditorReadyAndEditable) {
+          editor.view.focus(); // Force focus before command
+          commandCallback(editor.chain().focus()).run();
+        }
+      },
+      isActive: isEditorReadyAndEditable && isActiveCheck ? isActiveCheck() : false,
+      disabled: !isEditorReadyAndEditable || (canExecuteCheck ? !canExecuteCheck() : false),
+      type: "button" as const,
+    };
+  }, [editor]);
+    
+  const menuItems = useMemo(() => {
+    if (!editor) return []; 
+
     return [
       { ...createAction(chain => chain.toggleBold(), () => editor.isActive('bold'), () => editor.can().toggleBold()), icon: Bold, label: 'Bold' },
       { ...createAction(chain => chain.toggleItalic(), () => editor.isActive('italic'), () => editor.can().toggleItalic()), icon: Italic, label: 'Italic' },
@@ -108,7 +102,7 @@ const MenuBar: React.FC<{ editor: Editor | null }> = ({ editor }) => {
       { ...createAction(chain => chain.toggleBulletList(), () => editor.isActive('bulletList'), () => editor.can().toggleBulletList()), icon: List, label: 'Bullet List' },
       { ...createAction(chain => chain.toggleOrderedList(), () => editor.isActive('orderedList'), () => editor.can().toggleOrderedList()), icon: ListOrdered, label: 'Ordered List' },
       { ...createAction(chain => chain.toggleCodeBlock(), () => editor.isActive('codeBlock'), () => editor.can().toggleCodeBlock()), icon: Code2, label: 'Code Block' },
-      { action: addImage, icon: ImageIcon, label: 'Add Image', type: "button", disabled: !(editor && !editor.isDestroyed && editor.isEditable) },
+      { action: addImage, icon: ImageIcon, label: 'Add Image', type: "button" as const, disabled: !(editor && !editor.isDestroyed && editor.isEditable && editor.can().setImage({src:''})) },
       { ...createAction(chain => chain.setHorizontalRule(), undefined, () => editor.can().setHorizontalRule()), icon: Minus, label: 'Horizontal Rule' },
       { type: 'divider' as const },
       { ...createAction(chain => chain.unsetColor(), undefined, () => editor.can().unsetColor()), icon: Palette, label: 'Default Text Color' },
@@ -118,27 +112,39 @@ const MenuBar: React.FC<{ editor: Editor | null }> = ({ editor }) => {
         label: `Set text to ${color.name}`,
       })),
       { type: 'divider' as const },
-      { ...createAction(chain => chain.unsetHighlight(), () => editor.isActive('highlight', {color: ''}), () => editor.can().unsetHighlight()), icon: Highlighter, label: 'No Highlight'},
+      { ...createAction(chain => chain.unsetHighlight(), () => !editor.isActive('highlight'), () => editor.can().unsetHighlight()), icon: Highlighter, label: 'No Highlight'}, // Check for no active highlight might be tricky, rely on can()
       ...commonHighlights.map(color => ({
         ...createAction(chain => chain.toggleHighlight({ color: color.value }), () => editor.isActive('highlight', { color: color.value }), () => editor.can().toggleHighlight({color: color.value})),
         icon: () => <div style={{ backgroundColor: color.value }} title={`Highlight ${color.name}`} />,
         label: `Highlight ${color.name}`,
       })),
       { type: 'divider' as const },
-      { icon: Undo, label: 'Undo', action: () => { if (editor && !editor.isDestroyed && editor.isEditable) { editor.view.focus(); editor.chain().focus().undo().run()}}, disabled: !(editor?.can().undo()), type: "button" },
-      { icon: Redo, label: 'Redo', action: () => { if (editor && !editor.isDestroyed && editor.isEditable) { editor.view.focus(); editor.chain().focus().redo().run()}}, disabled: !(editor?.can().redo()), type: "button" },
+      { 
+        icon: Undo, 
+        label: 'Undo', 
+        action: () => { if (editor && !editor.isDestroyed && editor.isEditable) { editor.view.focus(); editor.chain().focus().undo().run()}}, 
+        disabled: !(editor && !editor.isDestroyed && editor.isEditable && editor.can().undo()), 
+        type: "button" as const 
+      },
+      { 
+        icon: Redo, 
+        label: 'Redo', 
+        action: () => { if (editor && !editor.isDestroyed && editor.isEditable) { editor.view.focus(); editor.chain().focus().redo().run()}}, 
+        disabled: !(editor && !editor.isDestroyed && editor.isEditable && editor.can().redo()), 
+        type: "button" as const 
+      },
       { ...createAction(chain => chain.unsetAllMarks().clearNodes(), undefined, () => editor.can().unsetAllMarks() && editor.can().clearNodes()), icon: Eraser, label: 'Clear Formatting' },
     ];
-  }, [editor, addImage, commonColors, commonHighlights]);
+  }, [editor, addImage, commonColors, commonHighlights, createAction]);
 
   if (!editor) {
     return (
       <div className="tiptap-toolbar">
-        <p className="text-muted-foreground p-2 text-sm">Editor loading or not available...</p>
+        <p className="text-muted-foreground p-2 text-sm">Editor initializing...</p>
       </div>
     );
   }
-
+  
   return (
     <div className="tiptap-toolbar">
       {menuItems.map((item, index) => {
@@ -148,7 +154,7 @@ const MenuBar: React.FC<{ editor: Editor | null }> = ({ editor }) => {
         const IconComponent = item.icon;
         return (
           <Button
-            key={item.label}
+            key={item.label || `button-${index}`} 
             type="button"
             variant={item.isActive ? 'secondary' : 'ghost'}
             size="sm"
@@ -166,20 +172,17 @@ const MenuBar: React.FC<{ editor: Editor | null }> = ({ editor }) => {
   );
 };
 
+
 const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, placeholder }) => {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        // For placeholder, Tiptap recommends using the Placeholder extension,
-        // but StarterKit's paragraph can also be configured for it.
-        // For simplicity, we rely on the CSS ::before pseudo-element if StarterKit's default doesn't pick it up
-        // Or ensure Placeholder extension is added if this becomes an issue.
-        // For now, the CSS in globals.css handles the placeholder.
-        heading: {
-          levels: [1, 2, 3, 4, 5, 6], // Default
-        },
-        codeBlock: {}, // Default
-        blockquote: {}, // Default
+        heading: { levels: [1, 2, 3, 4, 5, 6] }, // Keep default levels
+        codeBlock: {}, 
+        blockquote: {},
+      }),
+      Placeholder.configure({
+        placeholder: placeholder || "Start writing...",
       }),
       Underline,
       ImageExtension.configure({
@@ -190,7 +193,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
         },
       }),
       TextAlign.configure({
-        types: ['heading', 'paragraph', 'image'], // ensure image is included if you want to align images
+        types: ['heading', 'paragraph', 'image'], 
       }),
       TextStyle,
       Color,
@@ -200,7 +203,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
     ],
     content: value || '',
     onUpdate: ({ editor: currentEditor }) => {
-      if (!currentEditor.isDestroyed) {
+      if (currentEditor && !currentEditor.isDestroyed) {
         onEditorChange(currentEditor.getHTML());
       }
     },
@@ -209,22 +212,23 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
         class: 'tiptap prose max-w-none prose-headings:font-headline prose-headings:text-primary prose-a:text-accent hover:prose-a:text-primary prose-strong:text-foreground/90 prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground prose-code:bg-muted prose-code:text-foreground prose-code:p-1 prose-code:rounded-sm prose-pre:bg-muted prose-pre:text-foreground prose-pre:p-4 prose-pre:rounded-md',
       },
     },
-    // Ensure dependencies for useEditor are minimal and stable
-    // `onEditorChange` is memoized in parent components.
-    // `value` is for initial content and updates.
-    // `placeholder` is typically static.
-  }, [onEditorChange, value, placeholder]); // `value` and `placeholder` should be included if they can change and require editor re-configuration or content update. `onEditorChange` if it's not stable.
+  }, [onEditorChange, placeholder]); // Removed `value` from dependencies for initial load handling
 
   useEffect(() => {
+    // Set initial content only once or when value genuinely changes from outside
     if (editor && !editor.isDestroyed && value !== null && value !== undefined) {
-      // Only set content if it's different from the current editor content
-      // to avoid unnecessary updates and potential cursor jumps.
+      // Avoid re-setting content if it's the same, which can cause issues
       if (value !== editor.getHTML()) {
-        editor.commands.setContent(value, false); // false to not emit update
-        editor.commands.focus('end'); 
+          // Delay slightly to ensure editor is fully ready for content update
+          setTimeout(() => {
+              if (editor && !editor.isDestroyed) {
+                  editor.commands.setContent(value, false); 
+                  editor.commands.focus('end'); 
+              }
+          }, 0);
       }
     }
-  }, [value, editor]); // editor should be a dependency here
+  }, [value, editor]); // Only re-run if value or editor instance changes
 
   useEffect(() => {
     return () => {
@@ -232,15 +236,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
         editor.destroy();
       }
     };
-  }, [editor]); // editor should be a dependency here
+  }, [editor]);
 
   return (
     <div className="rounded-md border border-input bg-card shadow-sm">
       <MenuBar editor={editor} />
-      <EditorContent editor={editor} data-placeholder={placeholder || "Start writing..."} />
+      <EditorContent editor={editor} />
     </div>
   );
 };
 
 export default RichTextEditor;
-
