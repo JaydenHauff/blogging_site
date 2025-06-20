@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useActionState, useRef, useEffect, useState } from 'react';
+import { useActionState, useRef, useEffect, useState, useCallback } from 'react'; // Added useCallback
 import { useFormStatus } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { createBlogPostAction } from '@/lib/actions';
@@ -86,9 +86,9 @@ export default function CreatePostPage() {
     }
   };
 
-  const handleEditorChange = (content: string) => {
+  const handleEditorChange = useCallback((content: string) => {
     setEditorContent(content);
-  };
+  }, []); // Empty dependency array ensures stable function reference
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
@@ -100,10 +100,7 @@ export default function CreatePostPage() {
         <AlertDescription>
           Ensure this page and all admin functionalities are protected by authentication in production.
           <br />
-          The Tiptap rich text editor below provides basic formatting options. 
-          For image insertion directly within the editor, Tiptap's StarterKit does not include image handling by default;
-          you would need to add an image extension (e.g., `@tiptap/extension-image`).
-          The "Featured Image" upload below is separate for the main post image.
+          The Tiptap rich text editor below provides various formatting options, including image insertion via URL.
         </AlertDescription>
       </Alert>
 
@@ -178,6 +175,7 @@ export default function CreatePostPage() {
               <RichTextEditor
                 value={editorContent}
                 onEditorChange={handleEditorChange}
+                placeholder="Start crafting your blog post here..."
               />
             </div>
             {state.errors?.content && <p className="text-sm text-red-500 mt-1">{state.errors.content[0]}</p>}

@@ -7,7 +7,7 @@ import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import ImageExtension from '@tiptap/extension-image';
 import TextAlign from '@tiptap/extension-text-align';
-import TextStyle from '@tiptap/extension-text-style'; // Required for Color
+import TextStyle from '@tiptap/extension-text-style'; 
 import { Color } from '@tiptap/extension-color';
 import Highlight from '@tiptap/extension-highlight';
 import Subscript from '@tiptap/extension-subscript';
@@ -34,10 +34,10 @@ const MenuBar: React.FC<{ editor: Editor | null }> = ({ editor }) => {
   }
 
   const addImage = useCallback(() => {
-    if (!editor) return;
+    if (!editor || editor.isDestroyed) return;
     const url = window.prompt('Enter image URL:');
     if (url) {
-      editor.chain().focus().setImage({ src: url }).run();
+      editor.chain().focus().setImage({ src: url, alt: 'User provided image' }).run();
     }
   }, [editor]);
 
@@ -81,7 +81,7 @@ const MenuBar: React.FC<{ editor: Editor | null }> = ({ editor }) => {
       { action: () => editor.chain().focus().toggleBulletList().run(), icon: List, label: 'Bullet List', isActive: editor.isActive('bulletList') },
       { action: () => editor.chain().focus().toggleOrderedList().run(), icon: ListOrdered, label: 'Ordered List', isActive: editor.isActive('orderedList') },
       { action: () => editor.chain().focus().toggleCodeBlock().run(), icon: Code2, label: 'Code Block', isActive: editor.isActive('codeBlock') },
-      { action: addImage, icon: ImageIcon, label: 'Add Image' },
+      { action: addImage, icon: ImageIcon, label: 'Add Image' }, // Removed isActive for image button
       { action: () => editor.chain().focus().setHorizontalRule().run(), icon: Minus, label: 'Horizontal Rule' },
       { type: 'divider' as const },
       { action: () => editor.chain().focus().unsetColor().run(), icon: Palette, label: 'Default Text Color', isActive: editor.isActive('textStyle') && !editor.getAttributes('textStyle').color },
@@ -92,7 +92,7 @@ const MenuBar: React.FC<{ editor: Editor | null }> = ({ editor }) => {
         isActive: editor.isActive('textStyle', { color: color.value }),
       })),
       { type: 'divider' as const },
-       { action: () => editor.chain().focus().unsetHighlight().run(), icon: Highlighter, label: 'No Highlight', isActive: !editor.isActive('highlight') || editor.isActive('highlight', {color: ''})},
+      { action: () => editor.chain().focus().unsetHighlight().run(), icon: Highlighter, label: 'No Highlight', isActive: !editor.isActive('highlight') || editor.isActive('highlight', {color: ''})},
       ...commonHighlights.map(color => ({
         action: () => editor.chain().focus().toggleHighlight({ color: color.value }).run(),
         icon: () => <div className="h-4 w-4 rounded-sm border" style={{ backgroundColor: color.value }} title={`Highlight ${color.name}`} />,
@@ -116,14 +116,14 @@ const MenuBar: React.FC<{ editor: Editor | null }> = ({ editor }) => {
         return (
           <Button
             key={item.label}
-            type="button"
+            type="button" // Ensure all toolbar buttons are type="button"
             variant={item.isActive ? 'secondary' : 'ghost'}
             size="sm"
             onClick={item.action}
             disabled={item.disabled || false}
             aria-label={item.label}
             title={item.label}
-            className="p-2" // Simplified: active state handled by variant
+            className="p-2"
           >
             <IconComponent />
           </Button>
@@ -137,20 +137,21 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        heading: { levels: [1, 2, 3], HTMLAttributes: { class: 'font-headline text-primary' } }, // Basic styling for headings within editor
+        heading: { levels: [1, 2, 3], HTMLAttributes: { class: 'font-headline text-primary' } },
         blockquote: { HTMLAttributes: { class: 'border-l-4 border-primary pl-4 italic text-muted-foreground'}},
         codeBlock: { languageClassPrefix: 'language-', HTMLAttributes: { class: 'bg-muted p-2 rounded-md text-sm'} },
+        // History is enabled by default in StarterKit, no need for history: false
       }),
       Underline,
       ImageExtension.configure({
         inline: false, 
         allowBase64: true,
         HTMLAttributes: {
-          class: 'max-w-full h-auto rounded-md border my-4 mx-auto block',
+          class: 'max-w-full h-auto rounded-md border my-4 mx-auto block', // Style for inserted images
         },
       }),
       TextAlign.configure({
-        types: ['heading', 'paragraph', 'image'],
+        types: ['heading', 'paragraph', 'image'], // Allow text alignment for images too
       }),
       TextStyle, 
       Color,
@@ -164,29 +165,19 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
     },
     editorProps: {
       attributes: {
-        // Base structural styling for the editor container
         class: 'tiptap prose max-w-none prose-headings:font-headline prose-headings:text-primary prose-a:text-accent hover:prose-a:text-primary prose-strong:text-foreground/90 prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground prose-code:bg-muted prose-code:text-foreground prose-code:p-1 prose-code:rounded-sm prose-pre:bg-muted prose-pre:text-foreground prose-pre:p-4 prose-pre:rounded-md',
       },
     },
   });
 
   useEffect(() => {
-    // Sync external value changes to the editor
-    if (editor && value !== null && value !== undefined && value !== editor.getHTML()) {
-      if (!editor.isDestroyed) {
-        // Setting content often, ensure it's only when truly necessary.
-        // The comparison editor.getHTML() vs value is key.
-        editor.commands.setContent(value, false); // 'false' to not emit an update event from this change
-      }
+    if (editor && !editor.isDestroyed && value !== null && value !== undefined && value !== editor.getHTML()) {
+      editor.commands.setContent(value, false);
     }
   }, [value, editor]);
   
   useEffect(() => {
-    // Tiptap's Placeholder extension is part of StarterKit and handles this via CSS
-    // based on p.is-editor-empty:first-child::before and data-placeholder attribute.
-    // We just need to ensure the placeholder text is configured for the extension if custom.
-    // StarterKit.configure({ placeholder: { placeholder: placeholder }}) is one way if not using CSS.
-    // For now, relying on CSS with data-placeholder attribute.
+    // Placeholder is handled by StarterKit's Placeholder extension and CSS
   }, [editor, placeholder]);
 
 
@@ -207,4 +198,3 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
 };
 
 export default RichTextEditor;
-    

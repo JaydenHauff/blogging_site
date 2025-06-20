@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useActionState, useRef, useEffect, useState, use } from 'react'; // Added 'use'
+import { useActionState, useRef, useEffect, useState, use, useCallback } from 'react'; // Added useCallback
 import { useFormStatus } from 'react-dom';
 import { useRouter, notFound } from 'next/navigation';
 import { updateBlogPostAction } from '@/lib/actions';
@@ -16,7 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Terminal } from 'lucide-react';
 import Image from 'next/image';
-import TiptapEditor from '@/components/forms/rich-text-editor'; // Assuming this is the Tiptap editor
+import TiptapEditor from '@/components/forms/rich-text-editor';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -28,7 +28,7 @@ function SubmitButton() {
 }
 
 interface EditPostPageProps {
-  params: { slug: string }; // Keep original type, `use` can handle it
+  params: { slug: string };
 }
 
 export default function EditPostPage({ params: paramsAsProp }: EditPostPageProps) {
@@ -36,7 +36,6 @@ export default function EditPostPage({ params: paramsAsProp }: EditPostPageProps
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   
-  // Use React.use to unwrap params if it's a Promise, as suggested by Next.js warning
   const resolvedParams = use(paramsAsProp);
   const slug = resolvedParams.slug;
 
@@ -47,7 +46,6 @@ export default function EditPostPage({ params: paramsAsProp }: EditPostPageProps
   const [editorContent, setEditorContent] = useState<string>('');
 
   useEffect(() => {
-    // slug is now derived from resolvedParams
     const foundPost = MOCK_BLOG_POSTS.find(p => p.slug === slug);
     if (foundPost) {
       setPost(foundPost);
@@ -57,7 +55,7 @@ export default function EditPostPage({ params: paramsAsProp }: EditPostPageProps
     } else {
       notFound();
     }
-  }, [slug]); // Depend on the resolved 'slug'
+  }, [slug]);
 
   const initialState: { message: string | null; errors?: any; isError?: boolean; updatedPostSlug?: string } = { message: null };
   const [state, formAction] = useActionState(updateBlogPostAction, initialState);
@@ -105,14 +103,11 @@ export default function EditPostPage({ params: paramsAsProp }: EditPostPageProps
     }
   };
 
-  const handleEditorChange = (content: string) => {
+  const handleEditorChange = useCallback((content: string) => {
     setEditorContent(content);
-  };
+  }, []); // Empty dependency array ensures stable function reference
 
   if (!post) {
-    // `use(paramsAsProp)` will suspend if paramsAsProp is a promise.
-    // This loading state will be shown until the post data is fetched and set,
-    // or notFound() is called.
     return <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 text-center">Loading post data...</div>;
   }
 
@@ -125,7 +120,7 @@ export default function EditPostPage({ params: paramsAsProp }: EditPostPageProps
         <AlertTitle>Admin Area & Rich Text Editor</AlertTitle>
         <AlertDescription>
           You are editing an existing post. Ensure all admin functionalities are protected by authentication in production.
-          The Tiptap editor provides basic formatting.
+          The Tiptap editor provides various formatting options.
         </AlertDescription>
       </Alert>
 
@@ -201,6 +196,7 @@ export default function EditPostPage({ params: paramsAsProp }: EditPostPageProps
               <TiptapEditor
                 value={editorContent}
                 onEditorChange={handleEditorChange}
+                placeholder="Continue editing your blog post..."
               />
             </div>
             {state.errors?.content && <p className="text-sm text-red-500 mt-1">{state.errors.content[0]}</p>}
