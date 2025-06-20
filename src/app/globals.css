@@ -1,6 +1,4 @@
 
-@import 'react-quill/dist/quill.snow.css'; /* Import Quill styles */
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -86,57 +84,66 @@ body {
   }
 }
 
-/* ReactQuill specific styles */
-.quill-editor-container .ql-toolbar {
-  @apply rounded-t-md border-input bg-card; 
+/* Tiptap specific styles */
+.ProseMirror {
+  @apply min-h-[300px] p-4 focus:outline-none bg-muted/30 text-foreground border border-input border-t-0 rounded-b-md;
 }
 
-.quill-editor-container .ql-toolbar .ql-stroke {
-    stroke: hsl(var(--foreground)); 
-    fill: none;
-}
-.quill-editor-container .ql-toolbar .ql-fill {
-    fill: hsl(var(--foreground)); 
-}
-.quill-editor-container .ql-toolbar .ql-picker-label {
-    color: hsl(var(--foreground)); 
-}
-.quill-editor-container .ql-toolbar .ql-picker-options {
-    @apply bg-popover border-border; 
-}
-.quill-editor-container .ql-toolbar .ql-picker-item {
-    color: hsl(var(--popover-foreground)); 
-}
-.quill-editor-container .ql-toolbar .ql-picker-item:hover {
-    color: hsl(var(--accent));
-}
-.quill-editor-container .ql-toolbar .ql-picker-item.ql-selected {
-    color: hsl(var(--primary));
-}
-
-
-.quill-editor-container .ql-container {
-  @apply rounded-b-md border-input bg-muted/30 text-foreground; 
-  min-height: 300px; 
-  font-size: 1rem; 
-}
-
-.quill-editor-container .ql-editor {
-  @apply prose prose-invert max-w-none prose-headings:font-headline prose-headings:text-primary prose-a:text-accent hover:prose-a:text-primary prose-strong:text-foreground/90 prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground prose-code:bg-muted prose-code:text-foreground prose-code:p-1 prose-code:rounded-sm prose-pre:bg-muted prose-pre:text-foreground prose-pre:p-4 prose-pre:rounded-md;
-  padding: 1rem; 
-  color: hsl(var(--foreground)); 
-}
-
-.quill-editor-container .ql-editor.ql-blank::before{
-  @apply text-muted-foreground not-italic; 
+.ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
-  position: absolute;
-  left: 1rem; 
-  right: 1rem;
-  top: 1rem; 
-  pointer-events: none; 
+  float: left;
+  color: hsl(var(--muted-foreground));
+  pointer-events: none;
+  height: 0;
 }
 
+.ProseMirror h1, .ProseMirror h2, .ProseMirror h3, .ProseMirror h4, .ProseMirror h5, .ProseMirror h6 {
+  @apply font-headline text-primary;
+}
+
+.ProseMirror a {
+  @apply text-accent hover:text-primary cursor-pointer;
+}
+
+.ProseMirror strong {
+  @apply text-foreground/90;
+}
+
+.ProseMirror blockquote {
+  @apply border-l-4 border-primary pl-4 italic text-muted-foreground;
+}
+
+.ProseMirror pre {
+  @apply bg-muted text-foreground p-4 rounded-md overflow-x-auto;
+}
+.ProseMirror pre code {
+   @apply bg-transparent text-inherit p-0; /* Reset code style inside pre */
+}
+
+.ProseMirror code {
+  @apply bg-muted/50 text-accent px-1 py-0.5 rounded-sm text-sm;
+}
+
+.ProseMirror ul, .ProseMirror ol {
+  @apply list-inside pl-4 my-2;
+}
+.ProseMirror ul {
+  @apply list-disc;
+}
+.ProseMirror ol {
+  @apply list-decimal;
+}
+
+.ProseMirror hr {
+  @apply border-border my-4;
+}
+
+.ProseMirror img {
+  @apply max-w-full h-auto rounded-md my-2;
+}
+.ProseMirror img.ProseMirror-selectednode {
+  @apply outline outline-2 outline-primary outline-offset-2;
+}
 
 /* Sidebar specific scrollbar styling if needed */
 [data-sidebar="content"]::-webkit-scrollbar {

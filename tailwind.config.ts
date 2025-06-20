@@ -94,10 +94,30 @@ export default {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
       },
+      typography: (theme: (path: string) => any) => ({
+        DEFAULT: {
+          css: {
+            color: theme('colors.foreground'),
+            a: {
+              color: theme('colors.primary.DEFAULT'),
+              '&:hover': {
+                color: theme('colors.primary.DEFAULT / 0.8'),
+              },
+            },
+            h1: { fontFamily: theme('fontFamily.headline'), color: theme('colors.primary.DEFAULT') },
+            h2: { fontFamily: theme('fontFamily.headline'), color: theme('colors.primary.DEFAULT') },
+            h3: { fontFamily: theme('fontFamily.headline'), color: theme('colors.primary.DEFAULT') },
+            h4: { fontFamily: theme('fontFamily.headline'), color: theme('colors.primary.DEFAULT') },
+            strong: { color: theme('colors.foreground') },
+            code: { color: theme('colors.accent.DEFAULT'), backgroundColor: theme('colors.muted.DEFAULT / 0.5') },
+            blockquote: { color: theme('colors.muted.foreground'), borderLeftColor: theme('colors.primary.DEFAULT') },
+          },
+        },
+      }),
     },
   },
   plugins: [
     require('tailwindcss-animate'),
-    require('@tailwindcss/typography')
+    // Removed require('@tailwindcss/typography') as Tiptap handles prose styling
   ],
 } satisfies Config;
