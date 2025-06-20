@@ -109,11 +109,14 @@ body {
 
 @layer base {
   * {
-    @apply border-border;
+    /* Removed @apply border-border; */
   }
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  a {
+    @apply transition-colors duration-150 ease-in-out;
   }
 }
 
