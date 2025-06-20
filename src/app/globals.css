@@ -9,100 +9,101 @@ body {
 
 @layer base {
   :root {
-    /* MuseBlog Light Theme Variables */
-    --background: 260 50% 96.5%; /* Light grayish-violet: #F2F0F4 */
-    --foreground: 260 10% 20%; /* Dark gray for text */
+    /* GitHub-inspired Light Theme */
+    --background: 0 0% 100%;        /* White */
+    --foreground: 240 8% 15%;        /* Dark Gray (almost black) */
 
-    --card: 260 50% 100%; /* White for cards */
-    --card-foreground: 260 10% 20%;
+    --card: 0 0% 97%;             /* Very Light Gray (slightly off-white) */
+    --card-foreground: 240 8% 15%;
 
-    --popover: 260 50% 100%; /* White for popovers */
-    --popover-foreground: 260 10% 20%;
+    --popover: 0 0% 100%;           /* White */
+    --popover-foreground: 240 8% 15%;
 
-    --primary: 274 40% 64%; /* Muted violet: #9F82C6 */
-    --primary-foreground: 260 50% 98%; /* Almost white for text on primary */
+    --primary: 212 70% 45%;         /* GitHub Light Blue (e.g., #0969da) */
+    --primary-foreground: 0 0% 100%;  /* White */
 
-    --secondary: 274 25% 85%; /* Lighter, less saturated violet */
-    --secondary-foreground: 274 40% 40%; /* Darker violet for text on secondary */
+    --secondary: 0 0% 94%;          /* Light Gray */
+    --secondary-foreground: 240 8% 25%; /* Darker Gray */
 
-    --muted: 260 30% 90%;   /* Light gray for muted elements */
-    --muted-foreground: 260 10% 45%; /* Medium gray for muted text */
+    --muted: 0 0% 90%;              /* Medium Light Gray */
+    --muted-foreground: 240 5% 40%;   /* Medium Gray (GitHub's #57606a) */
 
-    --accent: 274 40% 50%;   /* Soft purple: #6D5496 */
-    --accent-foreground: 260 50% 98%; /* Almost white for text on accent */
+    --accent: 150 60% 38%;          /* GitHub Light Green (e.g., #1a7f37) */
+    --accent-foreground: 0 0% 100%;   /* White */
 
-    --destructive: 0 70% 55%;  /* A clear, but not overly harsh red */
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 75% 45%;       /* GitHub Light Red (e.g., #cf222e) */
+    --destructive-foreground: 0 0% 100%; /* White */
 
-    --border: 274 30% 80%;   /* Light violet-gray border */
-    --input: 274 30% 92%;    /* Slightly off-white for input backgrounds */
-    --ring: 274 40% 58%;     /* Primary color for focus rings, slightly darker/more saturated */
+    --border: 210 20% 87%;          /* Light Gray Border (GitHub's #d0d7de) */
+    --input: 0 0% 95%;              /* Slightly off-white for input backgrounds */
+    --ring: 212 70% 45%;            /* Primary color for focus rings */
 
     --radius: 0.5rem;
 
     /* Chart colors for light theme */
-    --chart-1: 274 50% 60%; /* primary-ish */
-    --chart-2: 290 50% 55%; /* accent-ish */
-    --chart-3: 260 60% 65%; 
-    --chart-4: 240 50% 60%; 
-    --chart-5: 300 50% 60%;
+    --chart-1: 212 70% 45%; /* Primary */
+    --chart-2: 150 60% 38%; /* Accent */
+    --chart-3: 180 60% 40%; /* Teal */
+    --chart-4: 270 50% 55%; /* Purple */
+    --chart-5: 30 70% 50%;  /* Orange */
 
     /* Sidebar - Light Theme */
-    --sidebar-background: 260 40% 94%; /* Slightly off-white, matching overall background lightness */
-    --sidebar-foreground: 260 10% 25%;
-    --sidebar-primary: 274 40% 60%; /* Primary, maybe a bit more saturated for sidebar */
-    --sidebar-primary-foreground: 260 50% 98%;
-    --sidebar-accent: 274 40% 50%; /* Accent */
-    --sidebar-accent-foreground: 260 50% 98%;
-    --sidebar-border: 274 30% 82%;
-    --sidebar-ring: 274 40% 55%;
+    --sidebar-background: 0 0% 97%;
+    --sidebar-foreground: 240 8% 15%;
+    --sidebar-primary: 212 70% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 150 60% 38%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 210 20% 85%;
+    --sidebar-ring: 212 70% 45%;
   }
 
   .dark {
-    --background: 260 15% 10%; 
-    --foreground: 260 10% 85%;
+    /* GitHub-inspired Dark Theme */
+    --background: 222 47% 11%;     /* GitHub Dark Background (e.g., #0d1117) */
+    --foreground: 210 17% 82%;     /* GitHub Dark Text (e.g., #c9d1d9) */
 
-    --card: 260 15% 13%; 
-    --card-foreground: 260 10% 85%;
+    --card: 222 40% 16%;          /* Darker Card Background (e.g., #161b22) */
+    --card-foreground: 210 17% 82%;
 
-    --popover: 260 15% 12%;
-    --popover-foreground: 260 10% 85%;
+    --popover: 222 40% 13%;       /* Dark Popover, similar to card */
+    --popover-foreground: 210 17% 82%;
 
-    --primary: 274 50% 68%; /* Brighter violet for dark mode */
-    --primary-foreground: 260 10% 15%; 
+    --primary: 212 92% 58%;         /* GitHub Dark Blue (e.g., #58a6ff) */
+    --primary-foreground: 222 47% 11%; /* Dark text for contrast on bright blue */
 
-    --secondary: 260 15% 20%; 
-    --secondary-foreground: 260 10% 80%;
+    --secondary: 222 25% 25%;      /* Medium Dark Gray */
+    --secondary-foreground: 210 17% 82%;
 
-    --muted: 260 15% 18%;   
-    --muted-foreground: 260 10% 60%; 
+    --muted: 222 20% 20%;         /* Darker Muted Elements */
+    --muted-foreground: 210 15% 55%;  /* GitHub Dark Muted Text (e.g., #8b949e) */
 
-    --accent: 274 55% 65%;   /* Accent slightly brighter */
-    --accent-foreground: 260 10% 10%; 
+    --accent: 160 70% 45%;          /* GitHub Dark Green/Teal (e.g., #2da44e / #3fb950) */
+    --accent-foreground: 0 0% 100%;   /* White text on accent */
 
-    --destructive: 0 60% 50%;  
-    --destructive-foreground: 0 0% 95%;
+    --destructive: 0 72% 51%;       /* GitHub Dark Red (e.g., #f85149) */
+    --destructive-foreground: 0 0% 98%; /* Almost white text on destructive */
 
-    --border: 260 15% 25%;   
-    --input: 260 15% 22%;    
-    --ring: 274 50% 70%;   
+    --border: 222 22% 23%;          /* GitHub Dark Border (e.g., #30363d) */
+    --input: 222 47% 11%;           /* Input same as background for seamless look */
+    --ring: 212 92% 58%;            /* Primary color for focus rings */
 
     /* Chart colors for dark theme */
-    --chart-1: 274 60% 70%; 
-    --chart-2: 290 60% 65%; 
-    --chart-3: 260 70% 75%;  
-    --chart-4: 240 60% 70%; 
-    --chart-5: 300 60% 70%; 
+    --chart-1: 212 92% 58%; /* Primary */
+    --chart-2: 160 70% 45%; /* Accent */
+    --chart-3: 180 70% 50%; /* Bright Teal/Cyan */
+    --chart-4: 270 60% 65%; /* Purple */
+    --chart-5: 30 80% 60%;  /* Orange */
 
     /* Sidebar - Dark Theme */
-    --sidebar-background: 260 15% 12%; 
-    --sidebar-foreground: 260 10% 85%;
-    --sidebar-primary: 274 50% 68%;
-    --sidebar-primary-foreground: 260 10% 15%;
-    --sidebar-accent: 274 55% 65%;
-    --sidebar-accent-foreground: 260 10% 10%;
-    --sidebar-border: 260 15% 28%;
-    --sidebar-ring: 274 50% 70%;
+    --sidebar-background: 222 40% 14%;
+    --sidebar-foreground: 210 17% 82%;
+    --sidebar-primary: 212 92% 58%;
+    --sidebar-primary-foreground: 222 47% 11%;
+    --sidebar-accent: 160 70% 45%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 222 22% 28%;
+    --sidebar-ring: 212 92% 58%;
   }
 }
 
@@ -190,9 +191,9 @@ body {
 
 .ProseMirror img {
   @apply max-w-full h-auto rounded-md my-2;
-  resize: both; /* Added for browser-based resizing */
-  overflow: auto; /* Often needed with resize */
-  cursor: grab; /* Indicate it can be interacted with */
+  resize: both; 
+  overflow: auto; 
+  cursor: grab; 
 }
 .ProseMirror img.ProseMirror-selectednode {
   @apply outline outline-2 outline-primary outline-offset-2;
