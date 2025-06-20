@@ -27,7 +27,11 @@ const BlogPostCard: React.FC<BlogPostCardProps> = ({ post, orientation = 'horizo
     return (
       <TranslucentContainer
         {...commonContainerProps}
-        className={cn("overflow-hidden h-full flex flex-col group border border-border/40", className)}
+        className={cn(
+          "overflow-hidden h-full flex flex-col group border border-border/40",
+          "hover:scale-[1.03] transition-transform duration-300 ease-in-out", 
+          className
+        )}
       >
         {post.imageUrl && (
           <div className="relative w-full aspect-square overflow-hidden"> {/* Changed h-56 to aspect-square */}
@@ -78,7 +82,11 @@ const BlogPostCard: React.FC<BlogPostCardProps> = ({ post, orientation = 'horizo
   return (
     <TranslucentContainer
       {...commonContainerProps}
-      className={cn("overflow-hidden group border border-border/40", className)}
+      className={cn(
+        "overflow-hidden group border border-border/40",
+        "hover:scale-[1.03] transition-transform duration-300 ease-in-out",
+        className
+      )}
     >
       <div className="md:flex">
         {post.imageUrl && (
