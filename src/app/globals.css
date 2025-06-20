@@ -99,17 +99,22 @@ body {
 }
 
 .tiptap-toolbar {
-  @apply flex flex-wrap items-center gap-1 p-2 border border-input border-b-0 rounded-t-md bg-muted;
+  @apply flex flex-wrap items-center gap-1 p-2 border-b border-input bg-card rounded-t-md; /* Updated for light theme consistency */
 }
 
 .tiptap-toolbar > button svg {
   @apply h-5 w-5; 
 }
+.tiptap-toolbar > button div { /* For color swatch buttons */
+    @apply h-4 w-4 rounded-sm border border-foreground/20;
+}
+
 
 /* Styles for the Tiptap editor container/wrapper */
 .tiptap { /* This class is applied via editorProps to the ProseMirror element */
-  @apply p-4 min-h-[300px] border border-input rounded-b-md bg-card text-foreground focus:outline-none;
-  /* Removed 'prose max-w-none' from @apply. These will be added directly to the element's class attribute. */
+  @apply p-4 min-h-[300px] bg-transparent text-foreground focus:outline-none; 
+  /* Removed border and rounded from here as it's on the outer div. Bg-transparent to inherit from outer container */
+  /* Prose classes are applied directly in the component now */
 }
 
 /* Default margins for elements within Tiptap, if needed beyond what 'prose' provides */
@@ -119,3 +124,25 @@ body {
 .tiptap > *:last-child {
   margin-bottom: 0;
 }
+
+/* Ensure images inserted into Tiptap are responsive */
+.tiptap img {
+  max-width: 100%;
+  height: auto;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-radius: 0.375rem; /* Corresponds to rounded-md */
+  border: 1px solid hsl(var(--border));
+}
+
+/* Styling for highlighted text */
+.tiptap mark {
+  padding: 0.1em 0.2em;
+  border-radius: 0.2em;
+}
+
+/* Text alignment classes that Tiptap might apply */
+.tiptap .text-left { text-align: left; }
+.tiptap .text-center { text-align: center; }
+.tiptap .text-right { text-align: right; }
+.tiptap .text-justify { text-align: justify; }
