@@ -4,6 +4,7 @@
 import { useActionState, useRef, useEffect, useState, use, useCallback } from 'react'; 
 import { useFormStatus } from 'react-dom';
 import { useRouter, notFound } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { updateBlogPostAction } from '@/lib/actions';
 import { MOCK_BLOG_POSTS } from '@/lib/constants';
 import type { BlogPost } from '@/types';
@@ -16,7 +17,17 @@ import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Terminal } from 'lucide-react';
 import Image from 'next/image';
-import TiptapEditor from '@/components/forms/rich-text-editor';
+import { Skeleton } from '@/components/ui/skeleton';
+
+const TiptapEditor = dynamic(() => import('@/components/forms/rich-text-editor'), { 
+  ssr: false,
+  loading: () => (
+    <div className="space-y-2">
+      <Skeleton className="h-10 w-full" />
+      <Skeleton className="h-[300px] w-full" />
+    </div>
+  )
+});
 
 function SubmitButton() {
   const { pending } = useFormStatus();

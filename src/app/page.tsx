@@ -32,11 +32,18 @@ export default function Home() {
     <div className="space-y-24 md:space-y-32 pb-16">
       {/* Hero Section */}
       <section 
-        className="relative min-h-[calc(100vh-5rem)] flex items-center justify-center py-20 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('https://placehold.co/1920x1080.png')" }} 
-        data-ai-hint="bright abstract geometric" 
+        className="relative min-h-[calc(100vh-5rem)] flex items-center justify-center py-20"
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/20 backdrop-blur-sm"></div> {/* Adjusted overlay for light theme */}
+        <Image
+            src="https://placehold.co/1920x1080.png"
+            alt="Abstract hero background image"
+            layout="fill"
+            objectFit="cover"
+            priority
+            data-ai-hint="bright abstract geometric" 
+            className="-z-10" 
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/20 backdrop-blur-sm"></div>
         <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
           <TranslucentContainer 
             className="max-w-3xl mx-auto" 

@@ -1,6 +1,23 @@
+
 import type {Metadata} from 'next';
 import './globals.css';
 import { MainLayout } from '@/components/layout/main-layout';
+import { Belleza, Alegreya } from 'next/font/google';
+
+const belleza = Belleza({
+  weight: '400',
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-belleza',
+});
+
+const alegreya = Alegreya({
+  subsets: ['latin'],
+  style: ['normal', 'italic'],
+  weight: ['400', '500', '600', '700', '800', '900'],
+  display: 'swap',
+  variable: '--font-alegreya',
+});
 
 export const metadata: Metadata = {
   title: 'MuseBlog - Your Source for Creative Inspiration',
@@ -20,12 +37,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth" suppressHydrationWarning={true}>
+    <html lang="en" className={`${belleza.variable} ${alegreya.variable} scroll-smooth`} suppressHydrationWarning={true}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Belleza&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet" />
+        {/* Removed direct Google Font links, handled by next/font */}
       </head>
       <body className="font-body antialiased">
         <MainLayout>
