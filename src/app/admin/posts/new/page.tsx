@@ -21,8 +21,8 @@ const RichTextEditor = dynamic(() => import('@/components/forms/rich-text-editor
   ssr: false,
   loading: () => (
     <div className="space-y-2">
-      <Skeleton className="h-10 w-full" />
-      <Skeleton className="h-[300px] w-full" />
+      <Skeleton className="h-10 w-full rounded-t-md" /> {/* Mimic toolbar */}
+      <Skeleton className="h-[300px] w-full rounded-b-md" /> {/* Mimic editor area */}
     </div>
   )
 });
@@ -60,6 +60,8 @@ export default function CreatePostPage() {
         setImageDataUri(null);
         setImageUrlInput('');
         setEditorContent(''); 
+        // Manually reset the RichTextEditor content if it's controlled.
+        // The 'value' prop change should handle this for the new editor.
         if (state.newPostSlug) {
           router.push('/admin/posts'); // Redirect to posts list
         }
@@ -97,6 +99,8 @@ export default function CreatePostPage() {
     }
   };
 
+  // useCallback ensures this function's identity is stable across re-renders
+  // unless its dependencies change, which is good practice for props passed to children.
   const handleEditorChange = useCallback((content: string) => {
     setEditorContent(content);
   }, []);
@@ -109,7 +113,7 @@ export default function CreatePostPage() {
         <Terminal className="h-4 w-4" />
         <AlertTitle>Content Editor</AlertTitle>
         <AlertDescription>
-          Utilize the Tiptap rich text editor below for formatting your post. Ensure all content is saved before navigating away.
+          Utilize the rich text editor below for formatting your post. Ensure all content is saved before navigating away.
         </AlertDescription>
       </Alert>
 

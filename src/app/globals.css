@@ -84,60 +84,30 @@ body {
   }
 }
 
-/* Tiptap Editor Styles for Light Theme */
-.ProseMirror {
-  outline: none;
+/* ReactQuill specific styles */
+.quill-editor-container .ql-toolbar {
+  @apply rounded-t-md border-input bg-card;
 }
 
-.ProseMirror p.is-editor-empty:first-child::before {
+.quill-editor-container .ql-container {
+  @apply rounded-b-md border-input bg-muted/30 text-foreground;
+  min-height: 300px; /* Ensure it has a decent default height */
+  font-size: 1rem; /* Or your desired base font size for the editor content */
+}
+
+/* Ensure prose styles apply within Quill content if needed, or style directly */
+.quill-editor-container .ql-editor {
+  @apply prose max-w-none prose-headings:font-headline prose-headings:text-primary prose-a:text-accent hover:prose-a:text-primary prose-strong:text-foreground/90 prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground prose-code:bg-muted prose-code:text-foreground prose-code:p-1 prose-code:rounded-sm prose-pre:bg-muted prose-pre:text-foreground prose-pre:p-4 prose-pre:rounded-md;
+  padding: 1rem; /* Add padding to the editor area */
+}
+
+.quill-editor-container .ql-editor.ql-blank::before{
+  @apply text-muted-foreground not-italic;
   content: attr(data-placeholder);
-  float: left;
-  color: hsl(var(--muted-foreground));
-  pointer-events: none;
-  height: 0;
+  position: absolute;
+  left: 1rem; /* Corresponds to .ql-editor padding */
+  right: 1rem;
 }
-
-.tiptap-toolbar {
-  @apply flex flex-wrap items-center gap-1 p-2 border-b border-input bg-card rounded-t-md;
-}
-
-/* Ensure Lucide icons and custom color swatch divs in toolbar are sized correctly */
-.tiptap-toolbar > button svg {
-  @apply h-5 w-5; /* Standard size for Lucide icons */
-}
-.tiptap-toolbar > button div { /* For custom color swatches */
-    @apply h-4 w-4 rounded-sm border border-foreground/20;
-}
-
-.tiptap {
-  @apply p-4 min-h-[300px] bg-muted/30 text-foreground focus:outline-none; /* Changed background for differentiation */
-  /* Typography is applied directly by prose classes in rich-text-editor.tsx editorProps */
-}
-
-.tiptap > *:first-child {
-  margin-top: 0;
-}
-.tiptap > *:last-child {
-  margin-bottom: 0;
-}
-
-.tiptap img {
-  /* Default styling applied by ImageExtension's HTMLAttributes in rich-text-editor.tsx */
-  /* e.g., class: 'max-w-full h-auto rounded-md border my-4 mx-auto block' */
-}
-
-/* Highlight styling example (Tiptap uses <mark>) */
-.tiptap mark {
-  /* background-color: #FFF3A3; Default yellow from Tiptap highlight extension if no color is set */
-  padding: 0.1em 0.2em;
-  border-radius: 0.2em;
-}
-
-/* Text alignment classes that Tiptap might apply if configured */
-.tiptap .text-left { text-align: left; }
-.tiptap .text-center { text-align: center; }
-.tiptap .text-right { text-align: right; }
-.tiptap .text-justify { text-align: justify; }
 
 
 /* Sidebar specific scrollbar styling if needed */
@@ -155,4 +125,3 @@ body {
 [data-sidebar="content"]::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--sidebar-accent));
 }
-

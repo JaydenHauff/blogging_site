@@ -19,12 +19,12 @@ import { Terminal } from 'lucide-react';
 import Image from 'next/image';
 import { Skeleton } from '@/components/ui/skeleton';
 
-const TiptapEditor = dynamic(() => import('@/components/forms/rich-text-editor'), { 
+const RichTextEditor = dynamic(() => import('@/components/forms/rich-text-editor'), { 
   ssr: false,
   loading: () => (
     <div className="space-y-2">
-      <Skeleton className="h-10 w-full" />
-      <Skeleton className="h-[300px] w-full" />
+      <Skeleton className="h-10 w-full rounded-t-md" /> {/* Mimic toolbar */}
+      <Skeleton className="h-[300px] w-full rounded-b-md" /> {/* Mimic editor area */}
     </div>
   )
 });
@@ -47,14 +47,18 @@ export default function EditPostPage({ params: paramsAsProp }: EditPostPageProps
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   
-  const resolvedParams = use(paramsAsProp);
-  const slug = resolvedParams.slug;
+  // Resolve params if it's a promise (can happen with dynamic segments)
+  // This 'use' hook is for client components to resolve promises,
+  // though params are usually directly available.
+  // For simplicity, let's assume paramsAsProp is already resolved or handle if it's a promise.
+  // const resolvedParams = use(Promise.resolve(paramsAsProp)); 
+  const slug = paramsAsProp.slug; // Direct use if not a promise
 
   const [post, setPost] = useState<BlogPost | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [imageDataUri, setImageDataUri] = useState<string | null>(null);
   const [imageUrlInput, setImageUrlInput] = useState<string>('');
-  const [editorContent, setEditorContent] = useState<string>('');
+  const [editorContent, setEditorContent] = useState<string>(''); // Initialize with empty string
 
   useEffect(() => {
     const foundPost = MOCK_BLOG_POSTS.find(p => p.slug === slug);
@@ -62,7 +66,7 @@ export default function EditPostPage({ params: paramsAsProp }: EditPostPageProps
       setPost(foundPost);
       setImageUrlInput(foundPost.imageUrl || '');
       setImagePreviewUrl(foundPost.imageUrl || null);
-      setEditorContent(foundPost.content || '');
+      setEditorContent(foundPost.content || ''); // Set initial content for the editor
     } else {
       notFound();
     }
@@ -113,13 +117,24 @@ export default function EditPostPage({ params: paramsAsProp }: EditPostPageProps
       setImagePreviewUrl(post?.imageUrl || null);
     }
   };
-
+  
   const handleEditorChange = useCallback((content: string) => {
     setEditorContent(content);
   }, []); 
 
   if (!post) {
-    return <div className="text-center">Loading post data...</div>;
+    // Show a loading state or skeleton while post data is being fetched/set
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Skeleton className="h-12 w-1/2 mb-4" />
+        <Skeleton className="h-8 w-1/3 mb-8" />
+        <div className="space-y-6">
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-24 w-full" />
+          <Skeleton className="h-64 w-full" />
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -130,7 +145,7 @@ export default function EditPostPage({ params: paramsAsProp }: EditPostPageProps
         <Terminal className="h-4 w-4" />
         <AlertTitle>Content Editor</AlertTitle>
         <AlertDescription>
-          You are editing an existing post. The Tiptap editor provides various formatting options.
+          You are editing an existing post. The rich text editor provides various formatting options.
         </AlertDescription>
       </Alert>
 
@@ -203,8 +218,8 @@ export default function EditPostPage({ params: paramsAsProp }: EditPostPageProps
           <div>
             <Label htmlFor="contentEditor">Content</Label>
             <div className="mt-1">
-              <TiptapEditor
-                value={editorContent}
+              <RichTextEditor
+                value={editorContent} // Pass the initial content here
                 onEditorChange={handleEditorChange}
                 placeholder="Continue editing your blog post..."
               />
