@@ -29,16 +29,25 @@ interface RichTextEditorProps {
 }
 
 const MenuBar: React.FC<{ editor: Editor | null }> = ({ editor }) => {
-  if (!editor) {
-    return null;
-  }
-
   const addImage = useCallback(() => {
-    if (!editor || editor.isDestroyed) return;
-    const url = window.prompt('Enter image URL:');
-    if (url) {
-      editor.chain().focus().setImage({ src: url, alt: 'User provided image' }).run();
+    if (!editor || editor.isDestroyed || !editor.isEditable) {
+      console.warn('Editor not available or not editable for addImage');
+      return;
     }
+    
+    // Ensure editor has focus before opening the prompt
+    editor.chain().focus().run();
+
+    const url = window.prompt('Enter image URL:');
+    if (url && url.trim() !== '') {
+      editor.chain().focus() // Re-focus might not be strictly necessary but can be a safeguard
+        .setImage({ src: url.trim(), alt: 'User provided image' })
+        .run();
+    } else if (url !== null) { // User clicked OK but entered empty or whitespace-only string
+      console.warn('Image URL cannot be empty.');
+      // Optionally, provide user feedback here e.g., via a toast
+    }
+    // If url is null, user clicked Cancel, do nothing.
   }, [editor]);
 
   const commonColors = useMemo(() => [
@@ -81,7 +90,7 @@ const MenuBar: React.FC<{ editor: Editor | null }> = ({ editor }) => {
       { action: () => editor.chain().focus().toggleBulletList().run(), icon: List, label: 'Bullet List', isActive: editor.isActive('bulletList') },
       { action: () => editor.chain().focus().toggleOrderedList().run(), icon: ListOrdered, label: 'Ordered List', isActive: editor.isActive('orderedList') },
       { action: () => editor.chain().focus().toggleCodeBlock().run(), icon: Code2, label: 'Code Block', isActive: editor.isActive('codeBlock') },
-      { action: addImage, icon: ImageIcon, label: 'Add Image' }, // Removed isActive for image button
+      { action: addImage, icon: ImageIcon, label: 'Add Image' },
       { action: () => editor.chain().focus().setHorizontalRule().run(), icon: Minus, label: 'Horizontal Rule' },
       { type: 'divider' as const },
       { action: () => editor.chain().focus().unsetColor().run(), icon: Palette, label: 'Default Text Color', isActive: editor.isActive('textStyle') && !editor.getAttributes('textStyle').color },
@@ -116,7 +125,7 @@ const MenuBar: React.FC<{ editor: Editor | null }> = ({ editor }) => {
         return (
           <Button
             key={item.label}
-            type="button" // Ensure all toolbar buttons are type="button"
+            type="button"
             variant={item.isActive ? 'secondary' : 'ghost'}
             size="sm"
             onClick={item.action}
@@ -133,25 +142,28 @@ const MenuBar: React.FC<{ editor: Editor | null }> = ({ editor }) => {
   );
 };
 
-const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, placeholder = "Start writing..." }) => {
+const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, placeholder }) => {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
         heading: { levels: [1, 2, 3], HTMLAttributes: { class: 'font-headline text-primary' } },
         blockquote: { HTMLAttributes: { class: 'border-l-4 border-primary pl-4 italic text-muted-foreground'}},
         codeBlock: { languageClassPrefix: 'language-', HTMLAttributes: { class: 'bg-muted p-2 rounded-md text-sm'} },
-        // History is enabled by default in StarterKit, no need for history: false
+        // History is enabled by default in StarterKit
+        placeholder: {
+            placeholder: placeholder || "Start writing...",
+        }
       }),
       Underline,
       ImageExtension.configure({
         inline: false, 
         allowBase64: true,
         HTMLAttributes: {
-          class: 'max-w-full h-auto rounded-md border my-4 mx-auto block', // Style for inserted images
+          class: 'max-w-full h-auto rounded-md border my-4 mx-auto block', 
         },
       }),
       TextAlign.configure({
-        types: ['heading', 'paragraph', 'image'], // Allow text alignment for images too
+        types: ['heading', 'paragraph', 'image'], 
       }),
       TextStyle, 
       Color,
@@ -176,9 +188,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
     }
   }, [value, editor]);
   
-  useEffect(() => {
-    // Placeholder is handled by StarterKit's Placeholder extension and CSS
-  }, [editor, placeholder]);
+  // Placeholder is handled by StarterKit's Placeholder extension via its configuration
+  // and the CSS in globals.css for .ProseMirror p.is-editor-empty:first-child::before
 
 
   useEffect(() => {
