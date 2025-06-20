@@ -45,13 +45,15 @@ const MenuBar: React.FC<{ editor: Editor | null }> = ({ editor }) => {
     { name: 'Red', value: '#e60000' },
     { name: 'Blue', value: '#0073e6' },
     { name: 'Green', value: '#008a00' },
+    { name: 'Primary', value: 'hsl(var(--primary))'},
   ];
 
   const commonHighlights = [
-    { name: 'Yellow', value: '#FFF3A3' }, // Softer yellow
+    { name: 'Yellow', value: '#FFF3A3' },
     { name: 'Light Blue', value: '#ADD8E6' },
     { name: 'Light Green', value: '#90EE90' },
-    { name: 'None', value: ''} // To remove highlight
+    { name: 'Accent', value: 'hsl(var(--accent))' },
+    { name: 'None', value: ''}
   ];
 
   const menuItems = [
@@ -83,15 +85,15 @@ const MenuBar: React.FC<{ editor: Editor | null }> = ({ editor }) => {
     { action: () => editor.chain().focus().unsetColor().run(), icon: Palette, label: 'Default Text Color', isActive: editor.isActive('textStyle') && !editor.getAttributes('textStyle').color },
     ...commonColors.map(color => ({
       action: () => editor.chain().focus().setColor(color.value).run(),
-      icon: () => <div className="h-4 w-4 rounded-sm border" style={{ backgroundColor: color.value }} />,
+      icon: () => <div className="h-4 w-4 rounded-sm border" style={{ backgroundColor: color.value }} title={`Set text to ${color.name}`} />,
       label: `Set text to ${color.name}`,
       isActive: editor.isActive('textStyle', { color: color.value }),
     })),
     { type: 'divider' as const },
-     { action: () => editor.chain().focus().unsetHighlight().run(), icon: Highlighter, label: 'No Highlight', isActive: !editor.isActive('highlight')},
+     { action: () => editor.chain().focus().unsetHighlight().run(), icon: Highlighter, label: 'No Highlight', isActive: !editor.isActive('highlight') || editor.isActive('highlight', {color: ''})},
     ...commonHighlights.map(color => ({
       action: () => editor.chain().focus().toggleHighlight({ color: color.value }).run(),
-      icon: () => <div className="h-4 w-4 rounded-sm border" style={{ backgroundColor: color.value }} />,
+      icon: () => <div className="h-4 w-4 rounded-sm border" style={{ backgroundColor: color.value }} title={`Highlight ${color.name}`} />,
       label: `Highlight ${color.name}`,
       isActive: editor.isActive('highlight', { color: color.value }),
     })),
@@ -111,13 +113,14 @@ const MenuBar: React.FC<{ editor: Editor | null }> = ({ editor }) => {
         return (
           <Button
             key={item.label}
+            type="button" // Explicitly set type to "button"
             variant={item.isActive ? 'secondary' : 'ghost'}
             size="sm"
             onClick={item.action}
             disabled={item.disabled || false}
             aria-label={item.label}
             title={item.label}
-            className={cn("p-2", { 'bg-muted text-accent-foreground': item.isActive })}
+            className={cn("p-2", { 'bg-muted text-primary': item.isActive })} // Ensure active state stands out
           >
             <IconComponent />
           </Button>
@@ -133,10 +136,12 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
       StarterKit.configure({
         heading: { levels: [1, 2, 3] },
         codeBlock: { languageClassPrefix: 'language-' },
+        // history is enabled by default
       }),
       Underline,
       ImageExtension.configure({
         inline: false, 
+        allowBase64: true,
         HTMLAttributes: {
           class: 'max-w-full h-auto rounded-md border my-4', 
         },
@@ -176,6 +181,15 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
     }
   }, [editor, placeholder]);
 
+  // Ensure editor is destroyed on component unmount
+  useEffect(() => {
+    return () => {
+      if (editor && !editor.isDestroyed) {
+        editor.destroy();
+      }
+    };
+  }, [editor]);
+
   return (
     <div className="rounded-md border border-input bg-card shadow-sm">
       <MenuBar editor={editor} />
@@ -185,3 +199,4 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
 };
 
 export default RichTextEditor;
+    
