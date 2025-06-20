@@ -1,14 +1,17 @@
 
-import { MOCK_BLOG_POSTS } from '@/lib/constants';
+import { MOCK_BLOG_POSTS, MOCK_COMMENTS } from '@/lib/constants';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import SocialShareButtons from '@/components/blog/social-share-buttons';
 import TranslucentContainer from '@/components/ui/translucent-container';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CalendarDays, UserCircle, Tag, Edit3 } from 'lucide-react';
+import { CalendarDays, UserCircle, Tag, Edit3, MessageSquare } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import Link from 'next/link';
+import CommentList from '@/components/blog/comment-list';
+import { CommentForm } from '@/components/forms/comment-form';
+import SectionTitle from '@/components/ui/section-title';
 
 interface BlogPostPageProps {
   params: { slug: string };
@@ -21,7 +24,9 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
     notFound();
   }
 
-  // In a real app, currentUrl would be dynamically determined
+  const postComments = MOCK_COMMENTS.filter(comment => comment.blogPostId === post.id && comment.isApproved)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
   const currentUrl = typeof window !== 'undefined' ? window.location.href : `https://museblog.com/blogs/${post.slug}`;
 
   return (
@@ -88,14 +93,17 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
           </div>
         </article>
 
-        {/* Comments Section Placeholder */}
         <section className="mt-12 md:mt-16">
-          <h2 className="text-3xl font-headline font-semibold text-primary mb-6">Comments</h2>
-          <TranslucentContainer baseColor="card" backgroundOpacity={70} padding="p-6 md:p-8">
-            <p className="text-muted-foreground">Comments are coming soon! Share your thoughts once this feature is live.</p>
-            {/* TODO: Implement comment form and display */}
-            {/* <CommentForm blogPostId={post.id} /> */}
-            {/* <CommentList comments={sampleComments} /> */}
+          <div className="flex items-center mb-6">
+            <MessageSquare className="h-8 w-8 text-primary mr-3" />
+            <h2 className="text-3xl font-headline font-semibold text-primary">
+              Comments ({postComments.length})
+            </h2>
+          </div>
+          <TranslucentContainer baseColor="card" backgroundOpacity={80} padding="p-6 md:p-8" shadow="shadow-xl" rounded="rounded-lg">
+            <CommentForm blogPostId={post.id} blogPostSlug={post.slug} />
+            <Separator className="my-8" />
+            <CommentList comments={postComments} />
           </TranslucentContainer>
         </section>
       </div>

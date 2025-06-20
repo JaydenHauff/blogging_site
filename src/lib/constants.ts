@@ -1,5 +1,5 @@
 
-import type { BlogPost, TeamMember } from '@/types';
+import type { BlogPost, TeamMember, Comment } from '@/types';
 
 export const MOCK_BLOG_POSTS: BlogPost[] = [
   {
@@ -101,6 +101,53 @@ export const MOCK_SUBSCRIBERS: { id: string; email: string; subscribedAt: string
   { id: 'sub2', email: 'another.fan@example.com', subscribedAt: '2024-07-05T14:30:00Z' },
   { id: 'sub3', email: 'avidreader@example.net', subscribedAt: '2024-07-10T09:15:00Z' },
 ];
+
+export const MOCK_COMMENTS: Comment[] = [
+  {
+    id: 'comment1',
+    blogPostId: '1',
+    blogPostSlug: 'first-post-journey-begins',
+    authorName: 'Reader One',
+    authorEmail: 'reader1@example.com',
+    userAvatarUrl: 'https://placehold.co/40x40.png?text=R1',
+    date: '2024-07-29T10:00:00Z',
+    text: 'Great first post! Looking forward to more.',
+    isApproved: true,
+  },
+  {
+    id: 'comment2',
+    blogPostId: '1',
+    blogPostSlug: 'first-post-journey-begins',
+    authorName: 'Supportive Sam',
+    userAvatarUrl: 'https://placehold.co/40x40.png?text=SS',
+    date: '2024-07-29T11:30:00Z',
+    text: 'Welcome to the blogging world! Your insights are valuable.',
+    replyText: 'Thank you, Sam! Glad to have you here.',
+    isApproved: true,
+  },
+  {
+    id: 'comment3',
+    blogPostId: '2',
+    blogPostSlug: 'mastering-modern-design',
+    authorName: 'Design Enthusiast',
+    authorEmail: 'designlover@example.com',
+    userAvatarUrl: 'https://placehold.co/40x40.png?text=DE',
+    date: '2024-07-26T14:00:00Z',
+    text: 'Excellent overview of design principles. The color theory section was particularly insightful.',
+    isApproved: true,
+  },
+  {
+    id: 'comment4',
+    blogPostId: '3',
+    blogPostSlug: 'the-art-of-storytelling',
+    authorName: 'Bookworm Bella',
+    userAvatarUrl: 'https://placehold.co/40x40.png?text=BB',
+    date: '2024-07-23T09:00:00Z',
+    text: 'Storytelling is indeed an art. How do you suggest practicing it daily?',
+    isApproved: true,
+  },
+];
+
 
 export const SITE_NAME = "MuseBlog";
 export const SITE_DESCRIPTION = "Discover engaging articles and stories on MuseBlog. A modern blogging platform designed for creative inspiration and thoughtful discussions.";

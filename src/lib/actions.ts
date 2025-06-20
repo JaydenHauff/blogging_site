@@ -2,13 +2,13 @@
 'use server';
 
 import { z } from 'zod';
-import type { BlogPost } from '@/types'; 
-import { MOCK_BLOG_POSTS, MOCK_SUBSCRIBERS } from './constants';
+import type { BlogPost, Comment } from '@/types'; 
+import { MOCK_BLOG_POSTS, MOCK_SUBSCRIBERS, MOCK_COMMENTS } from './constants';
 import { revalidatePath } from 'next/cache';
 
-const emailSchema = z.string().email({ message: "Invalid email address." });
+const emailSchema = z.string().email({ message: "Invalid email address." }).optional().or(z.literal(''));
 const newsletterSchema = z.object({
-  email: emailSchema,
+  email: z.string().email({ message: "Invalid email address." }),
 });
 
 export async function subscribeToNewsletter(prevState: any, formData: FormData) {
@@ -59,7 +59,7 @@ export async function subscribeToNewsletter(prevState: any, formData: FormData) 
 
 const contactFormSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  email: emailSchema,
+  email: z.string().email({ message: "Invalid email address." }),
   message: z.string().min(10, { message: "Message must be at least 10 characters." }),
 });
 
@@ -348,19 +348,146 @@ export async function updateSiteSettingsAction(prevState: any, formData: FormDat
   const settings = validatedFields.data;
 
   console.log('Site settings "updated" (mock):', settings);
-  // In a real app, you would save these settings to a database.
-  // MOCK_ constants like SITE_NAME, SITE_DESCRIPTION are not dynamically updated here.
 
   await new Promise(resolve => setTimeout(resolve, 1000));
   
-  // Revalidate paths that might consume these settings if they were dynamic
   revalidatePath('/admin/settings');
-  revalidatePath('/'); // Potentially for site name/description in layout/meta
-  // Add other relevant paths if settings affected them directly
+  revalidatePath('/'); 
 
   return {
     message: 'Site settings have been "saved" successfully (logged to console). These changes are for demonstration and are not persistently stored in this prototype.',
     errors: null,
     isError: false,
   };
+}
+
+// Comment Actions
+const commentSchema = z.object({
+  blogPostId: z.string().min(1),
+  blogPostSlug: z.string().min(1),
+  authorName: z.string().min(2, { message: "Name must be at least 2 characters." }),
+  authorEmail: emailSchema,
+  text: z.string().min(3, { message: "Comment must be at least 3 characters." }),
+});
+
+export async function addCommentAction(prevState: any, formData: FormData) {
+  const validatedFields = commentSchema.safeParse({
+    blogPostId: formData.get('blogPostId'),
+    blogPostSlug: formData.get('blogPostSlug'),
+    authorName: formData.get('authorName'),
+    authorEmail: formData.get('authorEmail'),
+    text: formData.get('text'),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Invalid comment data.',
+      isError: true,
+    };
+  }
+
+  const { blogPostId, blogPostSlug, authorName, authorEmail, text } = validatedFields.data;
+  
+  const newComment: Comment = {
+    id: `comment-${Date.now()}`,
+    blogPostId,
+    blogPostSlug,
+    authorName,
+    authorEmail: authorEmail || undefined,
+    userAvatarUrl: `https://placehold.co/40x40.png?text=${authorName.substring(0,2).toUpperCase()}`,
+    date: new Date().toISOString(),
+    text,
+    isApproved: true, // Auto-approve for now
+  };
+
+  console.log('New comment submitted (mock):', newComment);
+  // MOCK_COMMENTS.unshift(newComment); // This would add to the array in memory, but won't persist across requests for server components.
+
+  await new Promise(resolve => setTimeout(resolve, 700));
+  revalidatePath(`/blogs/${blogPostSlug}`);
+  revalidatePath('/admin/comments');
+
+  return {
+    errors: null,
+    message: 'Your comment has been submitted and logged to the console (mock action).',
+    isError: false,
+  };
+}
+
+const replyCommentSchema = z.object({
+  commentId: z.string().min(1),
+  replyText: z.string().min(3, { message: "Reply must be at least 3 characters." }),
+});
+
+export async function replyToCommentAction(prevState: any, formData: FormData) {
+  const validatedFields = replyCommentSchema.safeParse({
+    commentId: formData.get('commentId'),
+    replyText: formData.get('replyText'),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Invalid reply data.',
+      isError: true,
+    };
+  }
+
+  const { commentId, replyText } = validatedFields.data;
+  console.log(`Admin reply to comment ID ${commentId}: ${replyText} (mock action)`);
+
+  // Simulate updating the mock data (won't persist on page reload)
+  const commentIndex = MOCK_COMMENTS.findIndex(c => c.id === commentId);
+  if (commentIndex !== -1) {
+    // MOCK_COMMENTS[commentIndex].replyText = replyText;
+    // MOCK_COMMENTS[commentIndex].date = new Date().toISOString(); // Optionally update date
+     console.log(`Mock comment ${commentId} would be updated with reply.`)
+  }
+
+
+  await new Promise(resolve => setTimeout(resolve, 700));
+  revalidatePath('/admin/comments');
+  // Also revalidate the specific blog post if replies are shown there directly
+  if (commentIndex !== -1) {
+    revalidatePath(`/blogs/${MOCK_COMMENTS[commentIndex].blogPostSlug}`);
+  }
+  
+  return {
+    errors: null,
+    message: 'Reply submitted and logged (mock action).',
+    isError: false,
+  };
+}
+
+export async function deleteCommentAction(prevState: any, formData: FormData) {
+    const validatedFields = deleteByIdSchema.safeParse({
+        id: formData.get('commentId'),
+    });
+
+    if (!validatedFields.success) {
+        return {
+        message: 'Invalid Comment ID for deletion.',
+        isError: true,
+        };
+    }
+    const { id: commentId } = validatedFields.data;
+    const comment = MOCK_COMMENTS.find(c => c.id === commentId);
+    console.log(`Mock delete attempt for comment ID: ${commentId} from post ${comment?.blogPostSlug}`);
+    
+    // Simulate removal from mock data
+    // const commentIndex = MOCK_COMMENTS.findIndex(c => c.id === commentId);
+    // if (commentIndex !== -1) {
+    //     MOCK_COMMENTS.splice(commentIndex, 1);
+    // }
+
+    await new Promise(resolve => setTimeout(resolve, 500));
+    revalidatePath('/admin/comments');
+    if (comment) {
+        revalidatePath(`/blogs/${comment.blogPostSlug}`);
+    }
+    return {
+        message: `Comment with ID ${commentId} has been "deleted" (logged to console). (Mock data, won't persist).`,
+        isError: false,
+    };
 }

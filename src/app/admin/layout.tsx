@@ -1,3 +1,4 @@
+
 import type React from 'react';
 import Link from 'next/link';
 import {
@@ -15,7 +16,7 @@ import {
   SidebarGroupLabel,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
-import { BookOpenText, LayoutDashboard, Newspaper, Settings, Tags, Users, LogOut } from 'lucide-react';
+import { BookOpenText, LayoutDashboard, Newspaper, Settings, Tags, Users, LogOut, MessageSquareText } from 'lucide-react';
 import { SITE_NAME } from '@/lib/constants';
 
 export default function AdminLayout({
@@ -65,6 +66,14 @@ export default function AdminLayout({
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
+                 <SidebarMenuItem>
+                  <SidebarMenuButton asChild tooltip="Manage Comments">
+                    <Link href="/admin/comments">
+                      <MessageSquareText />
+                      <span>Comments</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroup>
 
@@ -93,7 +102,6 @@ export default function AdminLayout({
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-                {/* Add other site-related links here if needed, e.g., Transfer Access */}
               </SidebarMenu>
             </SidebarGroup>
           </SidebarMenu>
@@ -105,10 +113,8 @@ export default function AdminLayout({
           </Button>
         </SidebarFooter>
       </Sidebar>
-      <SidebarInset className="bg-background"> {/* Ensures main content area uses the global background */}
-        {/* The pt-20 from MainLayout for global header is inherited here */}
-        {/* Add any admin-specific header bar here if needed, otherwise children render directly */}
-        <div className="p-4 md:p-6 lg:p-8"> {/* Added padding to the content area */}
+      <SidebarInset className="bg-background">
+        <div className="p-4 md:p-6 lg:p-8">
           {children}
         </div>
       </SidebarInset>
