@@ -30,14 +30,13 @@ interface RichTextEditorProps {
 
 const MenuBar: React.FC<{ editor: Editor | null }> = ({ editor }) => {
   const addImage = useCallback(() => {
-    if (!editor || editor.isDestroyed) {
-      return;
-    }
+    if (!editor || editor.isDestroyed) return;
+
     // Ensure the editor has focus before opening the prompt
     editor.chain().focus().run();
     
     if (!editor.isEditable) {
-        // console.warn("Editor is not editable when trying to prompt for image URL."); // Cannot add console.log
+        // console.warn("Editor is not editable when trying to prompt for image URL.");
         return;
     }
 
@@ -46,10 +45,9 @@ const MenuBar: React.FC<{ editor: Editor | null }> = ({ editor }) => {
     if (url && url.trim() !== '') {
       // Re-focus and set the image after the prompt
       editor.chain().focus().setImage({ src: url.trim(), alt: 'User provided image' }).run();
-    } else if (url !== null) { // User clicked OK but entered empty or whitespace-only string
-      // console.warn('Image URL cannot be empty.'); // Cannot add console.log
+    } else if (url !== null) { 
+      // console.warn('Image URL cannot be empty.');
     }
-    // If url is null, user clicked Cancel, do nothing.
   }, [editor]);
 
   const commonColors = useMemo(() => [
@@ -68,52 +66,59 @@ const MenuBar: React.FC<{ editor: Editor | null }> = ({ editor }) => {
   ], []);
   
   const menuItems = useMemo(() => {
-    if (!editor) return [];
+    if (!editor || editor.isDestroyed) return [];
+    
+    const createAction = (command: (chain: any) => any) => () => {
+      if (editor && !editor.isDestroyed) {
+        command(editor.chain().focus()).run();
+      }
+    };
+
     return [
-      { action: () => editor.chain().focus().toggleBold().run(), icon: Bold, label: 'Bold', isActive: editor.isActive('bold') },
-      { action: () => editor.chain().focus().toggleItalic().run(), icon: Italic, label: 'Italic', isActive: editor.isActive('italic') },
-      { action: () => editor.chain().focus().toggleUnderline().run(), icon: UnderlineIcon, label: 'Underline', isActive: editor.isActive('underline') },
-      { action: () => editor.chain().focus().toggleStrike().run(), icon: Strikethrough, label: 'Strikethrough', isActive: editor.isActive('strike') },
-      { action: () => editor.chain().focus().toggleCode().run(), icon: Code, label: 'Inline Code', isActive: editor.isActive('code') },
-      { action: () => editor.chain().focus().toggleSubscript().run(), icon: SubscriptIcon, label: 'Subscript', isActive: editor.isActive('subscript')},
-      { action: () => editor.chain().focus().toggleSuperscript().run(), icon: SuperscriptIcon, label: 'Superscript', isActive: editor.isActive('superscript')},
+      { action: createAction(chain => chain.toggleBold()), icon: Bold, label: 'Bold', isActive: editor.isActive('bold') },
+      { action: createAction(chain => chain.toggleItalic()), icon: Italic, label: 'Italic', isActive: editor.isActive('italic') },
+      { action: createAction(chain => chain.toggleUnderline()), icon: UnderlineIcon, label: 'Underline', isActive: editor.isActive('underline') },
+      { action: createAction(chain => chain.toggleStrike()), icon: Strikethrough, label: 'Strikethrough', isActive: editor.isActive('strike') },
+      { action: createAction(chain => chain.toggleCode()), icon: Code, label: 'Inline Code', isActive: editor.isActive('code') },
+      { action: createAction(chain => chain.toggleSubscript()), icon: SubscriptIcon, label: 'Subscript', isActive: editor.isActive('subscript')},
+      { action: createAction(chain => chain.toggleSuperscript()), icon: SuperscriptIcon, label: 'Superscript', isActive: editor.isActive('superscript')},
       { type: 'divider' as const },
-      { action: () => editor.chain().focus().setParagraph().run(), icon: Pilcrow, label: 'Paragraph', isActive: editor.isActive('paragraph') },
-      { action: () => editor.chain().focus().toggleHeading({ level: 1 }).run(), icon: Heading1, label: 'Heading 1', isActive: editor.isActive('heading', { level: 1 }) },
-      { action: () => editor.chain().focus().toggleHeading({ level: 2 }).run(), icon: Heading2, label: 'Heading 2', isActive: editor.isActive('heading', { level: 2 }) },
-      { action: () => editor.chain().focus().toggleHeading({ level: 3 }).run(), icon: Heading3, label: 'Heading 3', isActive: editor.isActive('heading', { level: 3 }) },
+      { action: createAction(chain => chain.setParagraph()), icon: Pilcrow, label: 'Paragraph', isActive: editor.isActive('paragraph') },
+      { action: createAction(chain => chain.toggleHeading({ level: 1 })), icon: Heading1, label: 'Heading 1', isActive: editor.isActive('heading', { level: 1 }) },
+      { action: createAction(chain => chain.toggleHeading({ level: 2 })), icon: Heading2, label: 'Heading 2', isActive: editor.isActive('heading', { level: 2 }) },
+      { action: createAction(chain => chain.toggleHeading({ level: 3 })), icon: Heading3, label: 'Heading 3', isActive: editor.isActive('heading', { level: 3 }) },
       { type: 'divider' as const },
-      { action: () => editor.chain().focus().setTextAlign('left').run(), icon: AlignLeft, label: 'Align Left', isActive: editor.isActive({ textAlign: 'left' }) },
-      { action: () => editor.chain().focus().setTextAlign('center').run(), icon: AlignCenter, label: 'Align Center', isActive: editor.isActive({ textAlign: 'center' }) },
-      { action: () => editor.chain().focus().setTextAlign('right').run(), icon: AlignRight, label: 'Align Right', isActive: editor.isActive({ textAlign: 'right' }) },
-      { action: () => editor.chain().focus().setTextAlign('justify').run(), icon: AlignJustify, label: 'Align Justify', isActive: editor.isActive({ textAlign: 'justify' }) },
+      { action: createAction(chain => chain.setTextAlign('left')), icon: AlignLeft, label: 'Align Left', isActive: editor.isActive({ textAlign: 'left' }) },
+      { action: createAction(chain => chain.setTextAlign('center')), icon: AlignCenter, label: 'Align Center', isActive: editor.isActive({ textAlign: 'center' }) },
+      { action: createAction(chain => chain.setTextAlign('right')), icon: AlignRight, label: 'Align Right', isActive: editor.isActive({ textAlign: 'right' }) },
+      { action: createAction(chain => chain.setTextAlign('justify')), icon: AlignJustify, label: 'Align Justify', isActive: editor.isActive({ textAlign: 'justify' }) },
       { type: 'divider' as const },
-      { action: () => editor.chain().focus().toggleBlockquote().run(), icon: Quote, label: 'Blockquote', isActive: editor.isActive('blockquote') },
-      { action: () => editor.chain().focus().toggleBulletList().run(), icon: List, label: 'Bullet List', isActive: editor.isActive('bulletList') },
-      { action: () => editor.chain().focus().toggleOrderedList().run(), icon: ListOrdered, label: 'Ordered List', isActive: editor.isActive('orderedList') },
-      { action: () => editor.chain().focus().toggleCodeBlock().run(), icon: Code2, label: 'Code Block', isActive: editor.isActive('codeBlock') },
-      { action: addImage, icon: ImageIcon, label: 'Add Image' },
-      { action: () => editor.chain().focus().setHorizontalRule().run(), icon: Minus, label: 'Horizontal Rule' },
+      { action: createAction(chain => chain.toggleBlockquote()), icon: Quote, label: 'Blockquote', isActive: editor.isActive('blockquote') },
+      { action: createAction(chain => chain.toggleBulletList()), icon: List, label: 'Bullet List', isActive: editor.isActive('bulletList') },
+      { action: createAction(chain => chain.toggleOrderedList()), icon: ListOrdered, label: 'Ordered List', isActive: editor.isActive('orderedList') },
+      { action: createAction(chain => chain.toggleCodeBlock()), icon: Code2, label: 'Code Block', isActive: editor.isActive('codeBlock') },
+      { action: addImage, icon: ImageIcon, label: 'Add Image' }, // addImage already checks editor validity
+      { action: createAction(chain => chain.setHorizontalRule()), icon: Minus, label: 'Horizontal Rule' },
       { type: 'divider' as const },
-      { action: () => editor.chain().focus().unsetColor().run(), icon: Palette, label: 'Default Text Color', isActive: editor.isActive('textStyle') && !editor.getAttributes('textStyle').color },
+      { action: createAction(chain => chain.unsetColor()), icon: Palette, label: 'Default Text Color', isActive: editor.isActive('textStyle') && !editor.getAttributes('textStyle').color },
       ...commonColors.map(color => ({
-        action: () => editor.chain().focus().setColor(color.value).run(),
+        action: createAction(chain => chain.setColor(color.value)),
         icon: () => <div className="h-4 w-4 rounded-sm border" style={{ backgroundColor: color.value }} title={`Set text to ${color.name}`} />,
         label: `Set text to ${color.name}`,
         isActive: editor.isActive('textStyle', { color: color.value }),
       })),
       { type: 'divider' as const },
-      { action: () => editor.chain().focus().unsetHighlight().run(), icon: Highlighter, label: 'No Highlight', isActive: !editor.isActive('highlight') || editor.isActive('highlight', {color: ''})},
+      { action: createAction(chain => chain.unsetHighlight()), icon: Highlighter, label: 'No Highlight', isActive: !editor.isActive('highlight') || editor.isActive('highlight', {color: ''})},
       ...commonHighlights.map(color => ({
-        action: () => editor.chain().focus().toggleHighlight({ color: color.value }).run(),
+        action: createAction(chain => chain.toggleHighlight({ color: color.value })),
         icon: () => <div className="h-4 w-4 rounded-sm border" style={{ backgroundColor: color.value }} title={`Highlight ${color.name}`} />,
         label: `Highlight ${color.name}`,
         isActive: editor.isActive('highlight', { color: color.value }),
       })),
       { type: 'divider' as const },
-      { action: () => editor.chain().focus().undo().run(), icon: Undo, label: 'Undo', disabled: !editor.can().chain().focus().undo().run() },
-      { action: () => editor.chain().focus().redo().run(), icon: Redo, label: 'Redo', disabled: !editor.can().chain().focus().redo().run() },
-      { action: () => editor.chain().focus().unsetAllMarks().clearNodes().run(), icon: Eraser, label: 'Clear Formatting' },
+      { action: createAction(chain => chain.undo()), icon: Undo, label: 'Undo', disabled: !(editor && !editor.isDestroyed && editor.can().chain().focus().undo().run()) },
+      { action: createAction(chain => chain.redo()), icon: Redo, label: 'Redo', disabled: !(editor && !editor.isDestroyed && editor.can().chain().focus().redo().run()) },
+      { action: createAction(chain => chain.unsetAllMarks().clearNodes()), icon: Eraser, label: 'Clear Formatting' },
     ];
   }, [editor, addImage, commonColors, commonHighlights]);
 
@@ -127,7 +132,7 @@ const MenuBar: React.FC<{ editor: Editor | null }> = ({ editor }) => {
         return (
           <Button
             key={item.label}
-            type="button" // Explicitly set type to "button"
+            type="button"
             variant={item.isActive ? 'secondary' : 'ghost'}
             size="sm"
             onClick={item.action}
@@ -148,8 +153,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        heading: { levels: [1, 2, 3] }, // Simplified HTMLAttributes
-        blockquote: {}, // Simplified HTMLAttributes
+        // Defaults will allow H1-H6. Specific levels can be configured if needed.
+        // heading: {}, 
+        blockquote: {}, 
         codeBlock: { languageClassPrefix: 'language-', HTMLAttributes: { class: 'bg-muted p-2 rounded-md text-sm'} },
         placeholder: {
             placeholder: placeholder || "Start writing...",
