@@ -88,24 +88,24 @@ body {
 
 /* ReactQuill specific styles */
 .quill-editor-container .ql-toolbar {
-  @apply rounded-t-md border-input bg-card; /* Uses card background, should be dark now */
+  @apply rounded-t-md border-input bg-card; 
 }
 
 .quill-editor-container .ql-toolbar .ql-stroke {
-    stroke: hsl(var(--foreground)); /* Icon color */
+    stroke: hsl(var(--foreground)); 
     fill: none;
 }
 .quill-editor-container .ql-toolbar .ql-fill {
-    fill: hsl(var(--foreground)); /* Icon color */
+    fill: hsl(var(--foreground)); 
 }
 .quill-editor-container .ql-toolbar .ql-picker-label {
-    color: hsl(var(--foreground)); /* Dropdown text color */
+    color: hsl(var(--foreground)); 
 }
 .quill-editor-container .ql-toolbar .ql-picker-options {
-    @apply bg-popover border-border; /* Dropdown background */
+    @apply bg-popover border-border; 
 }
 .quill-editor-container .ql-toolbar .ql-picker-item {
-    color: hsl(var(--popover-foreground)); /* Dropdown item text color */
+    color: hsl(var(--popover-foreground)); 
 }
 .quill-editor-container .ql-toolbar .ql-picker-item:hover {
     color: hsl(var(--accent));
@@ -116,26 +116,25 @@ body {
 
 
 .quill-editor-container .ql-container {
-  @apply rounded-b-md border-input bg-muted/30 text-foreground; /* Uses muted background, should be dark; text foreground light */
-  min-height: 300px; /* Ensure it has a decent default height */
-  font-size: 1rem; /* Or your desired base font size for the editor content */
+  @apply rounded-b-md border-input bg-muted/30 text-foreground; 
+  min-height: 300px; 
+  font-size: 1rem; 
 }
 
-/* Ensure prose styles apply within Quill content if needed, or style directly */
 .quill-editor-container .ql-editor {
   @apply prose prose-invert max-w-none prose-headings:font-headline prose-headings:text-primary prose-a:text-accent hover:prose-a:text-primary prose-strong:text-foreground/90 prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground prose-code:bg-muted prose-code:text-foreground prose-code:p-1 prose-code:rounded-sm prose-pre:bg-muted prose-pre:text-foreground prose-pre:p-4 prose-pre:rounded-md;
-  padding: 1rem; /* Add padding to the editor area */
-  color: hsl(var(--foreground)); /* Explicitly set default text color */
+  padding: 1rem; 
+  color: hsl(var(--foreground)); 
 }
 
 .quill-editor-container .ql-editor.ql-blank::before{
-  @apply text-muted-foreground not-italic; /* Muted foreground should be light gray on dark */
+  @apply text-muted-foreground not-italic; 
   content: attr(data-placeholder);
   position: absolute;
-  left: 1rem; /* Corresponds to .ql-editor padding */
+  left: 1rem; 
   right: 1rem;
-  top: 1rem; /* Ensure placeholder is positioned within padding */
-  pointer-events: none; /* Prevent placeholder from interfering with clicks */
+  top: 1rem; 
+  pointer-events: none; 
 }
 
 

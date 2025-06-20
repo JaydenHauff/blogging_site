@@ -1,6 +1,7 @@
+
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 // CSS for react-quill is imported globally in src/app/globals.css
 
 interface RichTextEditorProps {
@@ -36,54 +37,69 @@ const formatsConfig = [
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, placeholder }) => {
   const [editorHtml, setEditorHtml] = useState<string>(value || '');
-  const QuillComponentRef = useRef<any>(null); // Store the dynamically imported component
-  const [isMounted, setIsMounted] = useState<boolean>(false);
+  const [isClient, setIsClient] = useState<boolean>(false);
+  // Store the dynamically imported component constructor in state
+  const [QuillModule, setQuillModule] = useState<any>(null);
+  const [importError, setImportError] = useState<string | null>(null);
+
 
   useEffect(() => {
-    setIsMounted(true); // Mark as mounted
+    setIsClient(true); // Indicates component has mounted on the client
   }, []);
 
   useEffect(() => {
-    // Only attempt to import Quill if mounted and not already loaded
-    if (isMounted && !QuillComponentRef.current) {
-      import('react-quill').then(module => {
-        QuillComponentRef.current = module.default;
-        // Force a re-render now that Quill is loaded
-        // A simple state update will trigger this.
-        setEditorHtml(currentHtml => currentHtml); 
-      }).catch(error => console.error("Failed to load ReactQuill", error));
+    if (isClient && !QuillModule && !importError) {
+      import('react-quill')
+        .then(module => {
+          // Set the Quill component constructor to state
+          setQuillModule(() => module.default);
+        })
+        .catch(error => {
+          console.error("Failed to load ReactQuill", error);
+          setImportError("Text editor failed to load. Please try again later.");
+        });
     }
-  }, [isMounted]); // Dependency on isMounted ensures this runs after mount
+  }, [isClient, QuillModule, importError]); // Dependencies for the effect
 
   // Sync external value changes to editorHtml
   useEffect(() => {
-    if (isMounted && value !== undefined && value !== editorHtml) {
+    if (isClient && value !== undefined && value !== editorHtml) {
       setEditorHtml(value);
     }
-  }, [value, editorHtml, isMounted]);
+  }, [value, editorHtml, isClient]);
 
   const handleChange = (html: string) => {
     setEditorHtml(html);
     onEditorChange(html); // Propagate change to parent
   };
 
-  // If not mounted or Quill component hasn't been loaded yet, show a placeholder
-  if (!isMounted || !QuillComponentRef.current) {
+  if (!isClient || (!QuillModule && !importError)) {
+    // Show loading skeleton if not on client yet, or if Quill is loading and no error
     return <div className="h-[300px] w-full rounded-md border border-input bg-muted animate-pulse" aria-label="Loading editor..."/>;
   }
 
-  const ReactQuill = QuillComponentRef.current;
+  if (importError) {
+    // Show error message if import failed
+    return (
+      <div className="h-[300px] w-full rounded-md border border-destructive bg-destructive/10 text-destructive p-4 flex items-center justify-center" role="alert">
+        <p>{importError}</p>
+      </div>
+    );
+  }
+
+  // At this point, QuillModule is loaded, so we can use it
+  const ReactQuillComponent = QuillModule;
 
   return (
-    <div className="bg-card rounded-md border border-input shadow-sm quill-editor-container-wrapper"> {/* Added a wrapper class if needed for specific styling scopes */}
-      <ReactQuill
+    <div className="bg-card rounded-md border border-input shadow-sm quill-editor-container-wrapper">
+      <ReactQuillComponent
         theme="snow"
         value={editorHtml}
         onChange={handleChange}
         modules={modulesConfig}
         formats={formatsConfig}
         placeholder={placeholder || "Start writing..."}
-        className="quill-editor-container" // For specific styling needs of the editor itself
+        className="quill-editor-container"
       />
     </div>
   );
