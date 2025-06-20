@@ -14,16 +14,15 @@ import Highlight from '@tiptap/extension-highlight';
 import Subscript from '@tiptap/extension-subscript';
 import Superscript from '@tiptap/extension-superscript';
 import Placeholder from '@tiptap/extension-placeholder';
-// FontSize extension removed due to install issues
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Bold, Italic, UnderlineIcon, Strikethrough, Code, Heading1, Heading2, Heading3,
   List, ListOrdered, Quote, Minus, Link2, ImageIcon,
   Palette, Highlighter, AlignLeft, AlignCenter, AlignRight, AlignJustify,
   Eraser, Undo, Redo, SubscriptIcon, SuperscriptIcon
-  // CaseSensitive (for font size) icon removed
 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
@@ -36,7 +35,6 @@ interface MenuBarProps {
 const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
   const [isImagePopoverOpen, setIsImagePopoverOpen] = useState(false);
   const [imageUrlInput, setImageUrlInput] = useState('');
-  // Font size state and related constants removed
 
   if (!editor) {
     return null;
@@ -54,7 +52,7 @@ const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
     disabled: !editor.isEditable || !(editor.can() as any)[actionName](params),
   });
   
-  const handleAddImage = () => {
+  const handleAddImageUrl = () => {
     if (!editor.isEditable || !imageUrlInput) return;
     editor.view.focus();
     editor.chain().focus().setImage({ src: imageUrlInput }).run();
@@ -62,15 +60,31 @@ const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
     setImageUrlInput('');
   };
 
+  const handleAddImageFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!editor || !editor.isEditable) return;
+    const file = event.target.files?.[0];
+    if (file) {
+      editor.view.focus(); 
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const dataUri = reader.result as string;
+        editor.chain().focus().setImage({ src: dataUri }).run();
+        setIsImagePopoverOpen(false);
+        if (event.target) event.target.value = ''; 
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const setLink = useCallback(() => {
     if (!editor.isEditable) return;
-    editor.view.focus(); // Focus before prompt
+    editor.view.focus(); 
     const previousUrl = editor.getAttributes('link').href;
     const url = window.prompt('Enter URL (leave empty to remove link):', previousUrl);
 
     if (url === null) return;
     
-    editor.view.focus(); // Re-focus after prompt
+    editor.view.focus(); 
     if (url === '') {
       editor.chain().focus().extendMarkRange('link').unsetLink().run();
     } else {
@@ -112,8 +126,6 @@ const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
       ))}
       <Separator orientation="vertical" className="h-6" />
 
-      {/* Font size popover removed */}
-
       <Button {...commonButtonProps('toggleBulletList')} title="Bullet List"><List size={18} /></Button>
       <Button {...commonButtonProps('toggleOrderedList')} title="Ordered List"><ListOrdered size={18} /></Button>
       <Button {...commonButtonProps('toggleBlockquote')} title="Blockquote"><Quote size={18} /></Button>
@@ -122,7 +134,7 @@ const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
         variant="outline"
         size="sm"
         className={`p-2 h-auto ${isCodeActive ? 'bg-primary/20 text-primary' : 'text-foreground'}`}
-        onClick={() => { if(editor.isEditable) { editor.view.focus(); handleCodeToggle(); }}}
+        onClick={() => { if(editor.isEditable) { handleCodeToggle(); }}}
         disabled={!editor.isEditable || !canToggleCodeOrCodeBlock}
         title="Code / Code Block"
       >
@@ -136,7 +148,7 @@ const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
         <Minus size={18} />
       </Button>
       <Separator orientation="vertical" className="h-6" />
-      <Button variant="outline" size="sm" className="p-2 h-auto text-foreground" onClick={() => { if(editor.isEditable) { editor.view.focus(); setLink(); }}} title="Set/Edit Link" disabled={!editor.isEditable || !editor.can().setLink({href: ''})}><Link2 size={18} /></Button>
+      <Button variant="outline" size="sm" className="p-2 h-auto text-foreground" onClick={() => { if(editor.isEditable) { setLink(); }}} title="Set/Edit Link" disabled={!editor.isEditable || !editor.can().setLink({href: ''})}><Link2 size={18} /></Button>
       
       <Popover open={isImagePopoverOpen} onOpenChange={setIsImagePopoverOpen}>
         <PopoverTrigger asChild>
@@ -144,18 +156,33 @@ const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
             <ImageIcon size={18} />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-2 space-y-2">
-            <p className="text-sm font-medium">Image URL</p>
-            <Input 
-              type="url" 
-              placeholder="https://example.com/image.png" 
-              value={imageUrlInput}
-              onChange={(e) => setImageUrlInput(e.target.value)}
-              className="w-full"
-            />
-            <Button onClick={handleAddImage} size="sm" className="w-full" disabled={!imageUrlInput || !editor.isEditable}>
-              Add Image
-            </Button>
+        <PopoverContent className="w-auto p-4 space-y-3 bg-card border-border shadow-lg rounded-md">
+            <p className="text-sm font-medium text-foreground">Add Image</p>
+            <div className="space-y-1">
+              <Label htmlFor="image-url-input" className="text-xs text-muted-foreground">Image URL</Label>
+              <Input
+                id="image-url-input"
+                type="url"
+                placeholder="https://example.com/image.png"
+                value={imageUrlInput}
+                onChange={(e) => setImageUrlInput(e.target.value)}
+                className="w-full bg-input text-foreground"
+              />
+              <Button onClick={handleAddImageUrl} size="sm" className="w-full mt-1" disabled={!imageUrlInput || !editor.isEditable}>
+                Add from URL
+              </Button>
+            </div>
+            <Separator />
+            <div className="space-y-1">
+              <Label htmlFor="image-file-input" className="text-xs text-muted-foreground">Or Upload from Computer</Label>
+              <Input
+                id="image-file-input"
+                type="file"
+                accept="image/*"
+                onChange={handleAddImageFile}
+                className="w-full text-xs file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 bg-input"
+              />
+            </div>
         </PopoverContent>
       </Popover>
 
@@ -193,7 +220,7 @@ const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
           id="tiptap-color-picker"
           type="color"
           onInput={(event) => { if(editor.isEditable) { editor.view.focus(); editor.chain().focus().setColor((event.target as HTMLInputElement).value).run(); }}}
-          value={editor.getAttributes('textStyle').color || '#ffffff'} // Default to white for dark theme, adjust if needed
+          value={editor.getAttributes('textStyle').color || (document.documentElement.classList.contains('dark') ? '#ffffff' : '#000000')}
           className="w-0 h-0 opacity-0 absolute"
           disabled={!editor.isEditable}
         />
@@ -206,7 +233,7 @@ const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
           id="tiptap-highlight-picker"
           type="color"
           onInput={(event) => { if(editor.isEditable) { editor.view.focus(); editor.chain().focus().toggleHighlight({ color: (event.target as HTMLInputElement).value }).run();}}}
-          value={editor.getAttributes('highlight').color || '#facc15'} // Default to a yellow highlight
+          value={editor.getAttributes('highlight').color || '#facc15'}
           className="w-0 h-0 opacity-0 absolute"
           disabled={!editor.isEditable}
         />
@@ -243,19 +270,21 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
         code: true,
         blockquote: true,
         horizontalRule: true,
-        history: true, // For undo/redo
+        history: true, 
       }),
       Underline,
-      ImageExtension, // Default image handling
+      ImageExtension.configure({
+        inline: false, // Allows images to be block elements
+        allowBase64: true, // Important for data URIs from local uploads
+      }),
       LinkExtension.configure({ openOnClick: false, autolink: true, linkOnPaste: true }),
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
-      TextStyle, // Required for Color and FontSize (though FontSize is removed for now)
+      TextStyle, 
       Color,
       Highlight.configure({ multicolor: true }),
       Subscript,
       Superscript,
       Placeholder.configure({ placeholder: placeholder || 'Start writing...' }),
-      // FontSize.configure({ types: ['textStyle']}), // FontSize extension removed
     ],
     content: value || '',
     editable: true,
@@ -264,15 +293,13 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-xl max-w-none', // Standard Tiptap prose classes
+        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-xl max-w-none', 
       },
     },
   });
 
   useEffect(() => {
     if (editor && value !== editor.getHTML()) {
-      // Only update content if it's different to avoid potential cursor jumps
-      // Use 'false' for emitUpdate to prevent an infinite loop if onEditorChange triggers a re-render
       editor.commands.setContent(value || '', false, { preserveWhitespace: 'full' });
     }
   }, [value, editor]);
@@ -284,7 +311,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
   }, [editor]);
 
   if (!editor) {
-    // Skeleton loader for when the editor is initializing
     return (
       <div className="bg-card rounded-md shadow-sm border border-input">
         <Skeleton className="h-10 w-full rounded-t-md bg-card" /> 
@@ -302,3 +328,5 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
 };
 
 export default RichTextEditor;
+
+    
