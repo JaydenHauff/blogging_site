@@ -292,6 +292,41 @@ export async function removeSubscriberAction(prevState: any, formData: FormData)
   };
 }
 
+const categorySchema = z.object({
+  categoryName: z.string().min(1, { message: "Category name is required." }),
+  categoryDescription: z.string().optional(),
+});
+
+export async function createCategoryAction(prevState: any, formData: FormData) {
+  const validatedFields = categorySchema.safeParse({
+    categoryName: formData.get('categoryName'),
+    categoryDescription: formData.get('categoryDescription'),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Invalid category data. Please check the fields below.',
+      isError: true,
+    };
+  }
+
+  const { categoryName, categoryDescription } = validatedFields.data;
+
+  console.log(`New category "created" (mock): Name: ${categoryName}, Description: ${categoryDescription || 'N/A'}`);
+
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  revalidatePath('/admin/categories');
+  revalidatePath('/admin/dashboard');
+
+  return {
+    message: `Category "${categoryName}" "created" successfully! It has been logged to the server console. (Mock data, won't appear in the list unless a blog post uses this category name).`,
+    errors: null,
+    isError: false,
+  };
+}
+
+
 const deleteCategorySchema = z.object({
   categoryName: z.string().min(1, { message: "Category name is required." }),
 });
