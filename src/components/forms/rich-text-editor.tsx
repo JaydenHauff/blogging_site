@@ -18,56 +18,72 @@ import Placeholder from '@tiptap/extension-placeholder';
 import { Button } from '@/components/ui/button';
 import {
   Bold, Italic, UnderlineIcon, Strikethrough, Code, Heading1, Heading2, Heading3,
-  List, ListOrdered, Quote, Minus, Link2, ImageIcon, Baseline, SuperscriptIcon, SubscriptIcon,
-  Palette, Highlighter, AlignLeft, AlignCenter, AlignRight, AlignJustify, Eraser, Undo, Redo
+  List, ListOrdered, Quote, Minus, Link2, ImageIcon,
+  Palette, Highlighter, AlignLeft, AlignCenter, AlignRight, AlignJustify,
+  Eraser, Undo, Redo, SubscriptIcon, SuperscriptIcon
 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface MenuBarProps {
-  editor: Editor;
+  editor: Editor | null;
 }
 
 const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
+  if (!editor) {
+    return null;
+  }
+
   const commonButtonProps = (actionName: keyof ReturnType<Editor['can']>, params?: any, activeName?: string) => ({
     variant: "outline" as const,
     size: "sm" as const,
     className: `p-2 h-auto ${editor.isActive(activeName || actionName as string, params) ? 'bg-primary/20 text-primary' : 'text-foreground'}`,
     onClick: () => {
-      if (!editor || !editor.isEditable) return;
-      editor.view.focus(); 
+      if (!editor.isEditable) return;
+      editor.view.focus();
       (editor.chain().focus() as any)[actionName](params).run();
     },
-    disabled: !editor || !editor.isEditable || !(editor.can() as any)[actionName](params),
+    disabled: !editor.isEditable || !(editor.can() as any)[actionName](params),
   });
 
   const addImage = useCallback(() => {
-    if (!editor || !editor.isEditable) return;
-    
-    const url = window.prompt('Enter image URL:'); // Prompt first
-    
-    if (url) { // If user provided a URL (not null, not empty)
-      editor.chain().focus().setImage({ src: url }).run(); // Then focus and set image
+    if (!editor.isEditable) return;
+    const url = window.prompt('Enter image URL:');
+    if (url) {
+      editor.view.focus();
+      editor.chain().focus().setImage({ src: url }).run();
     }
   }, [editor]);
 
   const setLink = useCallback(() => {
-    if (!editor || !editor.isEditable) return;
-    
+    if (!editor.isEditable) return;
     const previousUrl = editor.getAttributes('link').href;
-    // Prompt first
     const url = window.prompt('Enter URL (leave empty to remove link):', previousUrl);
 
-    if (url === null) return; // User cancelled
+    if (url === null) return;
 
-    // If user clears URL or provides one
+    editor.view.focus();
     if (url === '') {
       editor.chain().focus().extendMarkRange('link').unsetLink().run();
     } else {
       editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
     }
   }, [editor]);
+
+  const handleCodeToggle = () => {
+    if (!editor.isEditable) return;
+    editor.view.focus();
+    if (editor.state.selection && !editor.state.selection.empty) {
+      editor.chain().focus().toggleCode().run();
+    } else {
+      editor.chain().focus().toggleCodeBlock().run();
+    }
+  };
+
+  const isCodeActive = editor.isActive('code') || editor.isActive('codeBlock');
+  const canToggleCodeOrCodeBlock = (editor.can().toggleCode && editor.can().toggleCode()) || (editor.can().toggleCodeBlock && editor.can().toggleCodeBlock());
+
 
   const headingLevels: (1 | 2 | 3)[] = [1, 2, 3];
   const textAlignments = ['left', 'center', 'right', 'justify'];
@@ -91,28 +107,39 @@ const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
       <Button {...commonButtonProps('toggleBulletList')} title="Bullet List"><List size={18} /></Button>
       <Button {...commonButtonProps('toggleOrderedList')} title="Ordered List"><ListOrdered size={18} /></Button>
       <Button {...commonButtonProps('toggleBlockquote')} title="Blockquote"><Quote size={18} /></Button>
-      <Button {...commonButtonProps('toggleCodeBlock')} title="Code Block"><Code size={18} /></Button>
-      <Button 
-        {...commonButtonProps('setHorizontalRule')} 
+      
+      <Button
+        variant="outline"
+        size="sm"
+        className={`p-2 h-auto ${isCodeActive ? 'bg-primary/20 text-primary' : 'text-foreground'}`}
+        onClick={handleCodeToggle}
+        disabled={!editor.isEditable || !canToggleCodeOrCodeBlock}
+        title="Code / Code Block"
+      >
+        <Code size={18} />
+      </Button>
+
+      <Button
+        {...commonButtonProps('setHorizontalRule')}
         title="Horizontal Rule"
       >
         <Minus size={18} />
       </Button>
       <Separator orientation="vertical" className="h-6" />
-      <Button variant="outline" size="sm" className="p-2 h-auto text-foreground" onClick={setLink} title="Set/Edit Link" disabled={!editor || !editor.isEditable || !editor.can().setLink({href: ''})}><Link2 size={18} /></Button>
-      <Button 
-        variant="outline" size="sm" className="p-2 h-auto text-foreground" 
-        onClick={addImage} 
-        title="Add Image" 
-        disabled={!editor || !editor.isEditable || !editor.can().setImage({src:''})}
+      <Button variant="outline" size="sm" className="p-2 h-auto text-foreground" onClick={setLink} title="Set/Edit Link" disabled={!editor.isEditable || !editor.can().setLink({href: ''})}><Link2 size={18} /></Button>
+      <Button
+        variant="outline" size="sm" className="p-2 h-auto text-foreground"
+        onClick={addImage}
+        title="Add Image"
+        disabled={!editor.isEditable || !editor.can().setImage({src:''})}
       >
         <ImageIcon size={18} />
       </Button>
       <Separator orientation="vertical" className="h-6" />
-      
+
       <Popover>
         <PopoverTrigger asChild>
-          <Button variant="outline" size="sm" className="p-2 h-auto text-foreground" title="Text Align" disabled={!editor || !editor.isEditable}>
+          <Button variant="outline" size="sm" className="p-2 h-auto text-foreground" title="Text Align" disabled={!editor.isEditable}>
             {React.createElement(alignmentIcons[textAlignments.find(align => editor.isActive({ textAlign: align })) || 'left'], { size: 18 })}
           </Button>
         </PopoverTrigger>
@@ -123,8 +150,8 @@ const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
               variant="outline"
               size="icon"
               className={`p-1.5 h-auto ${editor.isActive({ textAlign: align }) ? 'bg-primary/20 text-primary' : 'text-foreground'}`}
-              onClick={() => { if(editor && editor.isEditable) { editor.view.focus(); editor.chain().focus().setTextAlign(align).run(); } }}
-              disabled={!editor || !editor.isEditable || !editor.can().setTextAlign(align)}
+              onClick={() => { if(editor.isEditable) { editor.view.focus(); editor.chain().focus().setTextAlign(align).run(); } }}
+              disabled={!editor.isEditable || !editor.can().setTextAlign(align)}
               title={`Align ${align}`}
               aria-label={`Align ${align}`}
             >
@@ -135,39 +162,39 @@ const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
       </Popover>
 
       <label htmlFor="tiptap-color-picker" className="cursor-pointer" title="Text Color">
-        <Button variant="outline" size="sm" className="p-2 h-auto text-foreground" asChild disabled={!editor || !editor.isEditable || !editor.can().setColor('')}>
+        <Button variant="outline" size="sm" className="p-2 h-auto text-foreground" asChild disabled={!editor.isEditable || !editor.can().setColor('')}>
           <span><Palette size={18} /></span>
         </Button>
         <input
           id="tiptap-color-picker"
           type="color"
-          onInput={(event) => { if(editor && editor.isEditable) { editor.view.focus(); editor.chain().focus().setColor((event.target as HTMLInputElement).value).run(); }}}
-          value={editor?.getAttributes('textStyle').color || '#ffffff'}
+          onInput={(event) => { if(editor.isEditable) { editor.view.focus(); editor.chain().focus().setColor((event.target as HTMLInputElement).value).run(); }}}
+          value={editor.getAttributes('textStyle').color || '#ffffff'} // Default to white for dark theme visibility
           className="w-0 h-0 opacity-0 absolute"
-          disabled={!editor || !editor.isEditable}
+          disabled={!editor.isEditable}
         />
       </label>
       <label htmlFor="tiptap-highlight-picker" className="cursor-pointer" title="Highlight Color">
-        <Button variant="outline" size="sm" className="p-2 h-auto text-foreground" asChild disabled={!editor || !editor.isEditable || !editor.can().toggleHighlight({color: ''})}>
+        <Button variant="outline" size="sm" className="p-2 h-auto text-foreground" asChild disabled={!editor.isEditable || !editor.can().toggleHighlight({color: ''})}>
           <span><Highlighter size={18} /></span>
         </Button>
         <input
           id="tiptap-highlight-picker"
           type="color"
-          onInput={(event) => { if(editor && editor.isEditable) { editor.view.focus(); editor.chain().focus().toggleHighlight({ color: (event.target as HTMLInputElement).value }).run();}}}
-          value={editor?.getAttributes('highlight').color || '#facc15'} 
+          onInput={(event) => { if(editor.isEditable) { editor.view.focus(); editor.chain().focus().toggleHighlight({ color: (event.target as HTMLInputElement).value }).run();}}}
+          value={editor.getAttributes('highlight').color || '#facc15'} // Default to yellow
           className="w-0 h-0 opacity-0 absolute"
-          disabled={!editor || !editor.isEditable}
+          disabled={!editor.isEditable}
         />
       </label>
       <Button {...commonButtonProps('toggleSubscript')} title="Subscript"><SubscriptIcon size={18} /></Button>
       <Button {...commonButtonProps('toggleSuperscript')} title="Superscript"><SuperscriptIcon size={18} /></Button>
       <Separator orientation="vertical" className="h-6" />
-      <Button 
-        variant="outline" size="sm" className="p-2 h-auto text-foreground" 
-        onClick={() => { if(editor && editor.isEditable) { editor.view.focus(); editor.chain().focus().unsetAllMarks().clearNodes().run(); }}} 
-        title="Clear Formatting" 
-        disabled={!editor || !editor.isEditable || !(editor.can().unsetAllMarks() && editor.can().clearNodes())}
+      <Button
+        variant="outline" size="sm" className="p-2 h-auto text-foreground"
+        onClick={() => { if(editor.isEditable) { editor.view.focus(); editor.chain().focus().unsetAllMarks().clearNodes().run(); }}}
+        title="Clear Formatting"
+        disabled={!editor.isEditable || !(editor.can().unsetAllMarks() && editor.can().clearNodes())}
       >
         <Eraser size={18} />
       </Button>
@@ -188,16 +215,17 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
     extensions: [
       StarterKit.configure({
         heading: { levels: [1, 2, 3] },
-        codeBlock: { languageClassPrefix: 'language-' },
-        blockquote: true, 
-        horizontalRule: true, 
-        history: true, 
+        codeBlock: { languageClassPrefix: 'language-' }, // For code blocks
+        code: true, // For inline code
+        blockquote: true,
+        horizontalRule: true,
+        history: true,
       }),
       Underline,
-      ImageExtension, 
+      ImageExtension,
       LinkExtension.configure({ openOnClick: false, autolink: true, linkOnPaste: true }),
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
-      TextStyle, 
+      TextStyle,
       Color,
       Highlight.configure({ multicolor: true }),
       Subscript,
@@ -211,16 +239,18 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-xl max-w-none', 
+        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-xl max-w-none',
       },
     },
   });
 
   useEffect(() => {
     if (editor && value !== editor.getHTML()) {
+      // Only set content if it's different to avoid cursor jumps
+      // and only after editor is initialized
       editor.commands.setContent(value || '', false, { preserveWhitespace: 'full' });
     }
-  }, [value, editor]); 
+  }, [value, editor]);
 
   useEffect(() => {
     return () => {
@@ -231,8 +261,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
   if (!editor) {
     return (
       <div className="bg-card rounded-md shadow-sm border border-input">
-        <Skeleton className="h-10 w-full rounded-t-md bg-card" /> 
-        <Skeleton className="h-[300px] w-full rounded-b-md bg-muted/30" /> 
+        <Skeleton className="h-10 w-full rounded-t-md bg-card" />
+        <Skeleton className="h-[300px] w-full rounded-b-md bg-muted/30" />
       </div>
     );
   }
@@ -246,3 +276,4 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
 };
 
 export default RichTextEditor;
+
