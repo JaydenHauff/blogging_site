@@ -27,15 +27,12 @@ export async function subscribeToNewsletter(prevState: any, formData: FormData) 
   const email = validatedFields.data.email;
   console.log(`Newsletter subscription attempt for: ${email}`);
   
-  // Mock: In a real app, you'd save this to a database.
-  // For this prototype, we just log it. The MOCK_SUBSCRIBERS array is static.
-  // You could check if email already exists in MOCK_SUBSCRIBERS for more realistic feedback.
   const isAlreadySubscribed = MOCK_SUBSCRIBERS.some(sub => sub.email === email);
   if (isAlreadySubscribed) {
     return {
       errors: null,
       message: `${email} is already subscribed!`,
-      isError: false, // Or true if you want to show an error style
+      isError: false, 
     };
   }
 
@@ -49,9 +46,8 @@ export async function subscribeToNewsletter(prevState: any, formData: FormData) 
     };
   }
   
-  // Simulate adding to a list for console, but MOCK_SUBSCRIBERS in constants.ts won't change dynamically for other requests
   console.log(`Mock subscription successful for: ${email}. This user would be added to a database.`);
-  revalidatePath('/admin/subscribers'); // Revalidate if we were showing dynamic data
+  revalidatePath('/admin/subscribers'); 
 
   return {
     errors: null,
@@ -151,7 +147,6 @@ export async function createBlogPostAction(prevState: any, formData: FormData) {
   };
 
   console.log('New blog post created (mock):', newPost);
-  // MOCK_BLOG_POSTS.unshift(newPost); // This won't persist server-side for subsequent requests
 
   await new Promise(resolve => setTimeout(resolve, 1000));
   revalidatePath('/blogs');
@@ -224,7 +219,6 @@ export async function updateBlogPostAction(prevState: any, formData: FormData) {
   };
 
   console.log(`Attempting to update post with ID ${id} (mock). New data:`, updatedPostData);
-  // MOCK_BLOG_POSTS[postIndex] = { ...MOCK_BLOG_POSTS[postIndex], ...updatedPostData };
 
   await new Promise(resolve => setTimeout(resolve, 1000));
 
@@ -262,8 +256,7 @@ export async function deletePostAction(prevState: any, formData: FormData) {
   }
   const { id } = validatedFields.data;
   console.log(`Mock delete attempt for post with ID: ${id}`);
-  // In a real app, delete from database here
-  // MOCK_BLOG_POSTS = MOCK_BLOG_POSTS.filter(post => post.id !== id); // This won't work for const
+
   await new Promise(resolve => setTimeout(resolve, 500));
   revalidatePath('/admin/posts');
   revalidatePath('/admin/dashboard');
@@ -276,7 +269,7 @@ export async function deletePostAction(prevState: any, formData: FormData) {
 }
 
 export async function removeSubscriberAction(prevState: any, formData: FormData) {
-  const validatedFields = deleteByIdSchema.safeParse({ // Reuse schema if it's just an ID
+  const validatedFields = deleteByIdSchema.safeParse({ 
     id: formData.get('id'),
   });
 
@@ -289,7 +282,7 @@ export async function removeSubscriberAction(prevState: any, formData: FormData)
   const { id } = validatedFields.data;
   const subscriber = MOCK_SUBSCRIBERS.find(s => s.id === id);
   console.log(`Mock removal attempt for subscriber with ID: ${id} (Email: ${subscriber?.email})`);
-  // In a real app, delete from database here
+
   await new Promise(resolve => setTimeout(resolve, 500));
   revalidatePath('/admin/subscribers');
   revalidatePath('/admin/dashboard');
@@ -316,12 +309,58 @@ export async function deleteCategoryAction(prevState: any, formData: FormData) {
   }
   const { categoryName } = validatedFields.data;
   console.log(`Mock delete attempt for category: ${categoryName}`);
-  // In a real app, you might nullify this category in posts or delete posts with this category
+
   await new Promise(resolve => setTimeout(resolve, 500));
   revalidatePath('/admin/categories');
   revalidatePath('/admin/dashboard');
   return {
     message: `Category "${categoryName}" has been "deleted" (logged to console). (Mock data, won't persist changes on page reload).`,
+    isError: false,
+  };
+}
+
+// Site Settings Action
+const siteSettingsSchema = z.object({
+  siteName: z.string().min(3, { message: "Site Name must be at least 3 characters." }),
+  siteDescription: z.string().min(10, { message: "Site Description must be at least 10 characters." }),
+  footerCopyrightText: z.string().optional(),
+  allowNewUserRegistrations: z.preprocess((val) => val === 'on' || val === true, z.boolean().optional()),
+  enableCommentsGlobally: z.preprocess((val) => val === 'on' || val === true, z.boolean().optional()),
+});
+
+export async function updateSiteSettingsAction(prevState: any, formData: FormData) {
+  const validatedFields = siteSettingsSchema.safeParse({
+    siteName: formData.get('siteName'),
+    siteDescription: formData.get('siteDescription'),
+    footerCopyrightText: formData.get('footerCopyrightText'),
+    allowNewUserRegistrations: formData.get('allowNewUserRegistrations'),
+    enableCommentsGlobally: formData.get('enableCommentsGlobally'),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Invalid site settings. Please check the fields below.',
+      isError: true,
+    };
+  }
+
+  const settings = validatedFields.data;
+
+  console.log('Site settings "updated" (mock):', settings);
+  // In a real app, you would save these settings to a database.
+  // MOCK_ constants like SITE_NAME, SITE_DESCRIPTION are not dynamically updated here.
+
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  // Revalidate paths that might consume these settings if they were dynamic
+  revalidatePath('/admin/settings');
+  revalidatePath('/'); // Potentially for site name/description in layout/meta
+  // Add other relevant paths if settings affected them directly
+
+  return {
+    message: 'Site settings have been "saved" successfully (logged to console). These changes are for demonstration and are not persistently stored in this prototype.',
+    errors: null,
     isError: false,
   };
 }
