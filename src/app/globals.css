@@ -11,53 +11,53 @@ body {
 
 @layer base {
   :root {
-    /* Elegant & Airy Light Theme */
-    --background: 276 100% 99%; /* #fcfaff - Light grayish-violet (background color) */
-    --foreground: 274 23% 30%; /* #413b51 - Dark muted violet for text */
+    /* Dark Theme Variables */
+    --background: 224 71.4% 4.1%; /* Dark blue-gray */
+    --foreground: 210 20% 98%; /* Almost white */
 
-    --card: 276 100% 100%; /* #ffffff - Pure White for cards */
-    --card-foreground: 274 23% 25%; /* #3a344a - Slightly darker for card text */
+    --card: 224 71.4% 5.5%; /* Slightly lighter than background for cards */
+    --card-foreground: 210 20% 98%;
 
-    --popover: 276 100% 100%; /* #ffffff */
-    --popover-foreground: 274 23% 25%; /* #3a344a */
+    --popover: 224 71.4% 6%; /* Consistent with card or slightly different dark */
+    --popover-foreground: 210 20% 98%;
 
-    --primary: 274 42% 64%; /* #9F82C6 - Muted violet (primary color) */
-    --primary-foreground: 0 0% 100%; /* #ffffff - White for text on primary */
+    --primary: 262.1 83.3% 62.8%; /* Vibrant Purple - slightly brighter for dark mode */
+    --primary-foreground: 210 20% 98%; /* Text on primary */
 
-    --secondary: 276 25% 90%; /* #e2dfe7 - Lighter, desaturated violet for secondary elements */
-    --secondary-foreground: 274 30% 40%; /* #584c6f - Readable text on secondary */
+    --secondary: 215 27.9% 16.9%; /* Muted blue-gray */
+    --secondary-foreground: 210 20% 98%;
 
-    --muted: 276 20% 94%;   /* #f0eef3 - Very light violet-gray for muted elements */
-    --muted-foreground: 274 15% 55%; /* #827c8f - Softer text for muted foreground */
+    --muted: 215 27.9% 12.9%;   /* Darker muted shade */
+    --muted-foreground: 217.9 10.6% 70.9%; /* Lighter gray for muted text on dark */
 
-    --accent: 274 30% 47%;   /* #6D5496 - Soft purple (accent color) */
-    --accent-foreground: 0 0% 100%; /* #ffffff - White for text on accent */
+    --accent: 170 70% 50%;   /* A contrasting accent - e.g., Teal */
+    --accent-foreground: 210 20% 98%; /* Text on accent */
 
-    --destructive: 0 70% 60%;  /* #e54c4c - A balanced red for destructive actions */
-    --destructive-foreground: 0 0% 100%; /* #ffffff */
+    --destructive: 0 62.8% 40.6%;  /* Darker, saturated red */
+    --destructive-foreground: 210 20% 98%;
 
-    --border: 276 20% 88%;   /* #e0dce3 - Light violet-gray border */
-    --input: 276 30% 95%;    /* #f3f0f7 - Slightly off-white input, harmonizing with violet */
-    --ring: 274 42% 70%;     /* #ad96d3 - Lighter primary for rings */
+    --border: 215 27.9% 20.9%;   /* Slightly lighter border for dark mode */
+    --input: 215 27.9% 18.9%;    /* Dark input background */
+    --ring: 262.1 83.3% 67.8%;     /* Lighter primary for rings */
 
     --radius: 0.5rem;
 
-    /* Chart colors for light theme - harmonizing with violets */
-    --chart-1: 274 40% 60%; /* Primary variant */
-    --chart-2: 274 30% 50%; /* Accent variant */
-    --chart-3: 260 50% 65%; /* A contrasting blue-violet */
-    --chart-4: 300 40% 70%; /* A pinkish-violet */
-    --chart-5: 240 40% 65%; /* A softer blue */
+    /* Chart colors for dark theme */
+    --chart-1: 260 70% 65%; 
+    --chart-2: 170 60% 45%; 
+    --chart-3: 30 70% 55%;  
+    --chart-4: 200 65% 50%; 
+    --chart-5: 320 60% 60%; 
 
-    /* Sidebar - Light Theme */
-    --sidebar-background: 276 60% 97%; /* #f7f5fa - Very light violet-gray */
-    --sidebar-foreground: 274 25% 35%; /* #4b435c */
-    --sidebar-primary: 274 42% 64%; /* #9F82C6 */
-    --sidebar-primary-foreground: 0 0% 100%; /* #ffffff */
-    --sidebar-accent: 274 30% 47%; /* #6D5496 */
-    --sidebar-accent-foreground: 0 0% 100%; /* #ffffff */
-    --sidebar-border: 276 30% 90%; /* #e7e3eb */
-    --sidebar-ring: 274 42% 70%; /* #ad96d3 */
+    /* Sidebar - Dark Theme */
+    --sidebar-background: 224 71.4% 6.5%; /* Darker sidebar */
+    --sidebar-foreground: 210 20% 98%;
+    --sidebar-primary: 262.1 83.3% 62.8%;
+    --sidebar-primary-foreground: 210 20% 98%;
+    --sidebar-accent: 170 70% 55%; /* Brighter accent for sidebar */
+    --sidebar-accent-foreground: 210 20% 98%;
+    --sidebar-border: 215 27.9% 22.9%;
+    --sidebar-ring: 262.1 83.3% 67.8%;
   }
 }
 
@@ -76,7 +76,7 @@ body {
     @apply bg-card/80 backdrop-blur-md shadow-xl; 
   }
   .translucent-effect-darker { 
-    @apply bg-black/5 backdrop-blur-sm shadow-lg;
+    @apply bg-black/20 backdrop-blur-sm shadow-lg; /* Adjusted for dark theme */
   }
    .font-headline {
     font-family: var(--font-belleza), serif; /* Updated to use CSS var */
@@ -88,23 +88,48 @@ body {
 
 /* ReactQuill specific styles */
 .quill-editor-container .ql-toolbar {
-  @apply rounded-t-md border-input bg-card;
+  @apply rounded-t-md border-input bg-card; /* Uses card background, should be dark now */
 }
 
+.quill-editor-container .ql-toolbar .ql-stroke {
+    stroke: hsl(var(--foreground)); /* Icon color */
+    fill: none;
+}
+.quill-editor-container .ql-toolbar .ql-fill {
+    fill: hsl(var(--foreground)); /* Icon color */
+}
+.quill-editor-container .ql-toolbar .ql-picker-label {
+    color: hsl(var(--foreground)); /* Dropdown text color */
+}
+.quill-editor-container .ql-toolbar .ql-picker-options {
+    @apply bg-popover border-border; /* Dropdown background */
+}
+.quill-editor-container .ql-toolbar .ql-picker-item {
+    color: hsl(var(--popover-foreground)); /* Dropdown item text color */
+}
+.quill-editor-container .ql-toolbar .ql-picker-item:hover {
+    color: hsl(var(--accent));
+}
+.quill-editor-container .ql-toolbar .ql-picker-item.ql-selected {
+    color: hsl(var(--primary));
+}
+
+
 .quill-editor-container .ql-container {
-  @apply rounded-b-md border-input bg-muted/30 text-foreground;
+  @apply rounded-b-md border-input bg-muted/30 text-foreground; /* Uses muted background, should be dark; text foreground light */
   min-height: 300px; /* Ensure it has a decent default height */
   font-size: 1rem; /* Or your desired base font size for the editor content */
 }
 
 /* Ensure prose styles apply within Quill content if needed, or style directly */
 .quill-editor-container .ql-editor {
-  @apply prose max-w-none prose-headings:font-headline prose-headings:text-primary prose-a:text-accent hover:prose-a:text-primary prose-strong:text-foreground/90 prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground prose-code:bg-muted prose-code:text-foreground prose-code:p-1 prose-code:rounded-sm prose-pre:bg-muted prose-pre:text-foreground prose-pre:p-4 prose-pre:rounded-md;
+  /* Prose classes are adapted by Tailwind for dark mode if correctly configured */
+  @apply prose prose-invert max-w-none prose-headings:font-headline prose-headings:text-primary prose-a:text-accent hover:prose-a:text-primary prose-strong:text-foreground/90 prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground prose-code:bg-muted prose-code:text-foreground prose-code:p-1 prose-code:rounded-sm prose-pre:bg-muted prose-pre:text-foreground prose-pre:p-4 prose-pre:rounded-md;
   padding: 1rem; /* Add padding to the editor area */
 }
 
 .quill-editor-container .ql-editor.ql-blank::before{
-  @apply text-muted-foreground not-italic;
+  @apply text-muted-foreground not-italic; /* Muted foreground should be light gray on dark */
   content: attr(data-placeholder);
   position: absolute;
   left: 1rem; /* Corresponds to .ql-editor padding */
@@ -127,3 +152,5 @@ body {
 [data-sidebar="content"]::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--sidebar-accent));
 }
+
+    
