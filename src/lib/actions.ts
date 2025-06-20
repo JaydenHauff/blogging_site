@@ -3,8 +3,8 @@
 
 import { z } from 'zod';
 import type { BlogPost } from '@/types'; 
-import { MOCK_BLOG_POSTS } from './constants'; // Import for finding post by slug for update
-import { revalidatePath } from 'next/cache'; // To potentially clear cache after update
+import { MOCK_BLOG_POSTS, MOCK_SUBSCRIBERS } from './constants';
+import { revalidatePath } from 'next/cache';
 
 const emailSchema = z.string().email({ message: "Invalid email address." });
 const newsletterSchema = z.object({
@@ -27,6 +27,18 @@ export async function subscribeToNewsletter(prevState: any, formData: FormData) 
   const email = validatedFields.data.email;
   console.log(`Newsletter subscription attempt for: ${email}`);
   
+  // Mock: In a real app, you'd save this to a database.
+  // For this prototype, we just log it. The MOCK_SUBSCRIBERS array is static.
+  // You could check if email already exists in MOCK_SUBSCRIBERS for more realistic feedback.
+  const isAlreadySubscribed = MOCK_SUBSCRIBERS.some(sub => sub.email === email);
+  if (isAlreadySubscribed) {
+    return {
+      errors: null,
+      message: `${email} is already subscribed!`,
+      isError: false, // Or true if you want to show an error style
+    };
+  }
+
   await new Promise(resolve => setTimeout(resolve, 1000));
 
   if (email === "fail@example.com") {
@@ -36,10 +48,14 @@ export async function subscribeToNewsletter(prevState: any, formData: FormData) 
       isError: true,
     };
   }
+  
+  // Simulate adding to a list for console, but MOCK_SUBSCRIBERS in constants.ts won't change dynamically for other requests
+  console.log(`Mock subscription successful for: ${email}. This user would be added to a database.`);
+  revalidatePath('/admin/subscribers'); // Revalidate if we were showing dynamic data
 
   return {
     errors: null,
-    message: `Thank you for subscribing, ${email}!`,
+    message: `Thank you for subscribing, ${email}! Your subscription has been logged.`,
     isError: false,
   };
 }
@@ -92,7 +108,6 @@ const postSchemaBase = {
   content: z.string().min(10, { message: "Content must be at least 10 characters." }),
 };
 
-// Schema for creating a new blog post
 const createPostSchema = z.object(postSchemaBase);
 
 export async function createBlogPostAction(prevState: any, formData: FormData) {
@@ -136,30 +151,25 @@ export async function createBlogPostAction(prevState: any, formData: FormData) {
   };
 
   console.log('New blog post created (mock):', newPost);
-  // In a real application, if imageDataUri was present, you would upload it to a storage 
-  // service here and use the returned URL for newPost.imageUrl.
-  // And you would save the newPost to a database.
-  // For now, we add to MOCK_BLOG_POSTS (note: this won't persist across requests in serverless environments)
-  // MOCK_BLOG_POSTS.unshift(newPost); // This is a side effect and generally not good for server actions with const arrays.
-                                   // For the prototype, this won't actually update the shared constant.
+  // MOCK_BLOG_POSTS.unshift(newPost); // This won't persist server-side for subsequent requests
 
   await new Promise(resolve => setTimeout(resolve, 1000));
   revalidatePath('/blogs');
   revalidatePath('/');
   revalidatePath(`/blogs/${newPost.slug}`);
+  revalidatePath('/admin/posts');
 
   return {
-    message: `Blog post "${newPost.title}" created successfully! It has been logged to the server console. (Mock data, won't persist new posts on page reload unless MOCK_BLOG_POSTS is mutated at module level - which is not ideal).`,
+    message: `Blog post "${newPost.title}" created successfully! It has been logged to the server console. (Mock data, won't persist new posts on page reload).`,
     errors: null,
     isError: false,
-    newPostSlug: newPost.slug, // Used to redirect or indicate success
+    newPostSlug: newPost.slug,
   };
 }
 
-// Schema for updating an existing blog post
 const updatePostSchema = z.object({
   ...postSchemaBase,
-  id: z.string().min(1, { message: "Post ID is required." }), // ID of the post to update
+  id: z.string().min(1, { message: "Post ID is required." }),
 });
 
 
@@ -188,8 +198,6 @@ export async function updateBlogPostAction(prevState: any, formData: FormData) {
   
   const { id, title, slug, author, category, tags, excerpt, imageUrl, imageDataUri, imageHint, content } = validatedFields.data;
 
-  // In a real app, find and update the post in the database
-  // For this prototype, we'll find it in MOCK_BLOG_POSTS (this won't modify the actual const array effectively across requests)
   const postIndex = MOCK_BLOG_POSTS.findIndex(p => p.id === id);
 
   if (postIndex === -1) {
@@ -202,10 +210,9 @@ export async function updateBlogPostAction(prevState: any, formData: FormData) {
 
   const finalImageUrl = imageDataUri && imageDataUri.startsWith('data:image') ? imageDataUri : (imageUrl || MOCK_BLOG_POSTS[postIndex].imageUrl);
 
-
   const updatedPostData: Partial<BlogPost> = {
     title,
-    slug, // Note: If slug changes, old links will break. Careful handling needed in real apps.
+    slug,
     author,
     category: category || undefined,
     tags: tags ? tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
@@ -213,28 +220,108 @@ export async function updateBlogPostAction(prevState: any, formData: FormData) {
     imageUrl: finalImageUrl,
     imageHint: imageHint || undefined,
     content,
-    date: new Date().toISOString(), // Update the date to reflect modification time
+    date: new Date().toISOString(), 
   };
 
   console.log(`Attempting to update post with ID ${id} (mock). New data:`, updatedPostData);
-  // MOCK_BLOG_POSTS[postIndex] = { ...MOCK_BLOG_POSTS[postIndex], ...updatedPostData }; // This won't persist due to const nature and module caching
+  // MOCK_BLOG_POSTS[postIndex] = { ...MOCK_BLOG_POSTS[postIndex], ...updatedPostData };
 
   await new Promise(resolve => setTimeout(resolve, 1000));
 
-  // Revalidate paths that might display this blog post
   revalidatePath('/blogs');
-  revalidatePath(`/blogs/${slug}`); // new slug
+  revalidatePath(`/blogs/${slug}`);
   if (MOCK_BLOG_POSTS[postIndex].slug !== slug) {
-    revalidatePath(`/blogs/${MOCK_BLOG_POSTS[postIndex].slug}`); // old slug
+    revalidatePath(`/blogs/${MOCK_BLOG_POSTS[postIndex].slug}`);
   }
   revalidatePath('/');
   revalidatePath('/admin/dashboard');
-
+  revalidatePath('/admin/posts');
 
   return {
     message: `Blog post "${title}" (ID: ${id}) has been "updated" successfully (logged to console). (Mock data, won't persist changes on page reload).`,
     errors: null,
     isError: false,
     updatedPostSlug: slug,
+  };
+}
+
+const deleteByIdSchema = z.object({
+  id: z.string().min(1, { message: "ID is required for deletion." }),
+});
+
+export async function deletePostAction(prevState: any, formData: FormData) {
+  const validatedFields = deleteByIdSchema.safeParse({
+    id: formData.get('id'),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      message: 'Invalid ID for deletion.',
+      isError: true,
+    };
+  }
+  const { id } = validatedFields.data;
+  console.log(`Mock delete attempt for post with ID: ${id}`);
+  // In a real app, delete from database here
+  // MOCK_BLOG_POSTS = MOCK_BLOG_POSTS.filter(post => post.id !== id); // This won't work for const
+  await new Promise(resolve => setTimeout(resolve, 500));
+  revalidatePath('/admin/posts');
+  revalidatePath('/admin/dashboard');
+  revalidatePath('/blogs');
+  revalidatePath('/');
+  return {
+    message: `Post with ID ${id} has been "deleted" (logged to console). (Mock data, won't persist changes on page reload).`,
+    isError: false,
+  };
+}
+
+export async function removeSubscriberAction(prevState: any, formData: FormData) {
+  const validatedFields = deleteByIdSchema.safeParse({ // Reuse schema if it's just an ID
+    id: formData.get('id'),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      message: 'Invalid ID for removal.',
+      isError: true,
+    };
+  }
+  const { id } = validatedFields.data;
+  const subscriber = MOCK_SUBSCRIBERS.find(s => s.id === id);
+  console.log(`Mock removal attempt for subscriber with ID: ${id} (Email: ${subscriber?.email})`);
+  // In a real app, delete from database here
+  await new Promise(resolve => setTimeout(resolve, 500));
+  revalidatePath('/admin/subscribers');
+  revalidatePath('/admin/dashboard');
+  return {
+    message: `Subscriber with ID ${id} (Email: ${subscriber?.email}) has been "removed" (logged to console). (Mock data, won't persist changes on page reload).`,
+    isError: false,
+  };
+}
+
+const deleteCategorySchema = z.object({
+  categoryName: z.string().min(1, { message: "Category name is required." }),
+});
+
+export async function deleteCategoryAction(prevState: any, formData: FormData) {
+  const validatedFields = deleteCategorySchema.safeParse({
+    categoryName: formData.get('categoryName'),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      message: 'Invalid category name for deletion.',
+      isError: true,
+    };
+  }
+  const { categoryName } = validatedFields.data;
+  console.log(`Mock delete attempt for category: ${categoryName}`);
+  // In a real app, you might nullify this category in posts or delete posts with this category
+  await new Promise(resolve => setTimeout(resolve, 500));
+  revalidatePath('/admin/categories');
+  revalidatePath('/admin/dashboard');
+  return {
+    message: `Category "${categoryName}" has been "deleted" (logged to console). (Mock data, won't persist changes on page reload).`,
+    isError: false,
   };
 }

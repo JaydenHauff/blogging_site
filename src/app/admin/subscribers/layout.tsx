@@ -1,7 +1,7 @@
 
 import type React from 'react';
 
-export default function AdminUsersLayout({
+export default function AdminSubscribersLayout({
   children,
 }: {
   children: React.ReactNode;

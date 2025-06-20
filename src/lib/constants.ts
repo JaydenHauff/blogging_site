@@ -1,3 +1,4 @@
+
 import type { BlogPost, TeamMember } from '@/types';
 
 export const MOCK_BLOG_POSTS: BlogPost[] = [
@@ -53,6 +54,19 @@ export const MOCK_BLOG_POSTS: BlogPost[] = [
     category: 'Technology',
     tags: ['ai', 'innovation', 'future tech'],
   },
+   {
+    id: '5',
+    slug: 'healthy-mind-healthy-life',
+    title: 'Cultivating a Healthy Mind for a Healthy Life',
+    date: '2024-07-18',
+    author: 'Dr. Wellness',
+    imageUrl: 'https://placehold.co/600x400.png',
+    imageHint: 'serene meditation',
+    excerpt: 'Explore practical tips for mental well-being and building resilience in everyday life.',
+    content: '<p>Mental health is as important as physical health. This article discusses various techniques like mindfulness, stress management, and seeking support.</p>',
+    category: 'Personal Growth',
+    tags: ['mental health', 'mindfulness', 'well-being'],
+  },
 ];
 
 export const MOCK_TEAM_MEMBERS: TeamMember[] = [
@@ -80,6 +94,12 @@ export const MOCK_TEAM_MEMBERS: TeamMember[] = [
     imageHint: 'woman smiling',
     bio: 'Sophia fosters a vibrant community, connecting readers and writers on MuseBlog.',
   },
+];
+
+export const MOCK_SUBSCRIBERS: { id: string; email: string; subscribedAt: string }[] = [
+  { id: 'sub1', email: 'subscriber1@example.com', subscribedAt: '2024-07-01T10:00:00Z' },
+  { id: 'sub2', email: 'another.fan@example.com', subscribedAt: '2024-07-05T14:30:00Z' },
+  { id: 'sub3', email: 'avidreader@example.net', subscribedAt: '2024-07-10T09:15:00Z' },
 ];
 
 export const SITE_NAME = "MuseBlog";
