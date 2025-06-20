@@ -30,22 +30,24 @@ interface RichTextEditorProps {
 
 const MenuBar: React.FC<{ editor: Editor | null }> = ({ editor }) => {
   const addImage = useCallback(() => {
-    if (!editor || editor.isDestroyed || !editor.isEditable) {
-      console.warn('Editor not available or not editable for addImage');
+    if (!editor || editor.isDestroyed) {
       return;
     }
-    
-    // Ensure editor has focus before opening the prompt
+    // Ensure the editor has focus before opening the prompt
     editor.chain().focus().run();
+    
+    if (!editor.isEditable) {
+        // console.warn("Editor is not editable when trying to prompt for image URL."); // Cannot add console.log
+        return;
+    }
 
     const url = window.prompt('Enter image URL:');
+    
     if (url && url.trim() !== '') {
-      editor.chain().focus() // Re-focus might not be strictly necessary but can be a safeguard
-        .setImage({ src: url.trim(), alt: 'User provided image' })
-        .run();
+      // Re-focus and set the image after the prompt
+      editor.chain().focus().setImage({ src: url.trim(), alt: 'User provided image' }).run();
     } else if (url !== null) { // User clicked OK but entered empty or whitespace-only string
-      console.warn('Image URL cannot be empty.');
-      // Optionally, provide user feedback here e.g., via a toast
+      // console.warn('Image URL cannot be empty.'); // Cannot add console.log
     }
     // If url is null, user clicked Cancel, do nothing.
   }, [editor]);
@@ -125,7 +127,7 @@ const MenuBar: React.FC<{ editor: Editor | null }> = ({ editor }) => {
         return (
           <Button
             key={item.label}
-            type="button"
+            type="button" // Explicitly set type to "button"
             variant={item.isActive ? 'secondary' : 'ghost'}
             size="sm"
             onClick={item.action}
@@ -146,10 +148,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        heading: { levels: [1, 2, 3], HTMLAttributes: { class: 'font-headline text-primary' } },
-        blockquote: { HTMLAttributes: { class: 'border-l-4 border-primary pl-4 italic text-muted-foreground'}},
+        heading: { levels: [1, 2, 3] }, // Simplified HTMLAttributes
+        blockquote: {}, // Simplified HTMLAttributes
         codeBlock: { languageClassPrefix: 'language-', HTMLAttributes: { class: 'bg-muted p-2 rounded-md text-sm'} },
-        // History is enabled by default in StarterKit
         placeholder: {
             placeholder: placeholder || "Start writing...",
         }
@@ -183,15 +184,13 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
   });
 
   useEffect(() => {
-    if (editor && !editor.isDestroyed && value !== null && value !== undefined && value !== editor.getHTML()) {
-      editor.commands.setContent(value, false);
+    if (editor && !editor.isDestroyed && value !== null && value !== undefined) {
+      if (value !== editor.getHTML()) {
+        editor.commands.setContent(value, false);
+      }
     }
   }, [value, editor]);
   
-  // Placeholder is handled by StarterKit's Placeholder extension via its configuration
-  // and the CSS in globals.css for .ProseMirror p.is-editor-empty:first-child::before
-
-
   useEffect(() => {
     return () => {
       if (editor && !editor.isDestroyed) {
@@ -209,3 +208,4 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onEditorChange, 
 };
 
 export default RichTextEditor;
+    
