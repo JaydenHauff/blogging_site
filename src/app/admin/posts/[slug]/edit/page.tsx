@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useActionState, useRef, useEffect, useState, use, useCallback } from 'react'; 
+import { useActionState, useRef, useEffect, useState, useCallback } from 'react';
 import { useFormStatus } from 'react-dom';
 import { useRouter, notFound } from 'next/navigation';
 import dynamic from 'next/dynamic';
@@ -19,7 +19,7 @@ import { Terminal } from 'lucide-react';
 import Image from 'next/image';
 import { Skeleton } from '@/components/ui/skeleton';
 
-const RichTextEditor = dynamic(() => import('@/components/forms/rich-text-editor'), { 
+const RichTextEditor = dynamic(() => import('@/components/forms/rich-text-editor').then(mod => mod.default), {
   ssr: false,
   loading: () => (
     <div className="space-y-2">
@@ -46,19 +46,14 @@ export default function EditPostPage({ params: paramsAsProp }: EditPostPageProps
   const router = useRouter();
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
-  
-  // Resolve params if it's a promise (can happen with dynamic segments)
-  // This 'use' hook is for client components to resolve promises,
-  // though params are usually directly available.
-  // For simplicity, let's assume paramsAsProp is already resolved or handle if it's a promise.
-  // const resolvedParams = use(Promise.resolve(paramsAsProp)); 
-  const slug = paramsAsProp.slug; // Direct use if not a promise
+
+  const slug = paramsAsProp.slug;
 
   const [post, setPost] = useState<BlogPost | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [imageDataUri, setImageDataUri] = useState<string | null>(null);
   const [imageUrlInput, setImageUrlInput] = useState<string>('');
-  const [editorContent, setEditorContent] = useState<string>(''); // Initialize with empty string
+  const [editorContent, setEditorContent] = useState<string>('');
 
   useEffect(() => {
     const foundPost = MOCK_BLOG_POSTS.find(p => p.slug === slug);
@@ -66,7 +61,7 @@ export default function EditPostPage({ params: paramsAsProp }: EditPostPageProps
       setPost(foundPost);
       setImageUrlInput(foundPost.imageUrl || '');
       setImagePreviewUrl(foundPost.imageUrl || null);
-      setEditorContent(foundPost.content || ''); // Set initial content for the editor
+      setEditorContent(foundPost.content || '');
     } else {
       notFound();
     }
@@ -83,7 +78,7 @@ export default function EditPostPage({ params: paramsAsProp }: EditPostPageProps
         variant: state.isError ? 'destructive' : 'default',
       });
       if (!state.isError && state.updatedPostSlug) {
-        router.push(`/admin/posts`); // Redirect to posts list
+        router.push(`/admin/posts`);
       }
     }
   }, [state, toast, router]);
@@ -96,11 +91,11 @@ export default function EditPostPage({ params: paramsAsProp }: EditPostPageProps
         const dataUri = reader.result as string;
         setImagePreviewUrl(dataUri);
         setImageDataUri(dataUri);
-        setImageUrlInput(''); 
+        setImageUrlInput('');
       };
       reader.readAsDataURL(file);
     } else {
-      setImagePreviewUrl(post?.imageUrl || null); 
+      setImagePreviewUrl(post?.imageUrl || null);
       setImageDataUri(null);
     }
   };
@@ -110,20 +105,19 @@ export default function EditPostPage({ params: paramsAsProp }: EditPostPageProps
     setImageUrlInput(url);
     if (url) {
       setImagePreviewUrl(url);
-      setImageDataUri(null); 
+      setImageDataUri(null);
       const fileInput = document.getElementById('imageFile') as HTMLInputElement;
-      if (fileInput) fileInput.value = ''; 
-    } else if (!imageDataUri) { 
+      if (fileInput) fileInput.value = '';
+    } else if (!imageDataUri) {
       setImagePreviewUrl(post?.imageUrl || null);
     }
   };
-  
+
   const handleEditorChange = useCallback((content: string) => {
     setEditorContent(content);
-  }, []); 
+  }, []);
 
   if (!post) {
-    // Show a loading state or skeleton while post data is being fetched/set
     return (
       <div className="container mx-auto px-4 py-8">
         <Skeleton className="h-12 w-1/2 mb-4" />
@@ -167,7 +161,7 @@ export default function EditPostPage({ params: paramsAsProp }: EditPostPageProps
             <p className="text-xs text-muted-foreground mt-1">Should be unique, URL-friendly (lowercase, hyphens for spaces).</p>
             {state.errors?.slug && <p className="text-sm text-red-500 mt-1">{state.errors.slug[0]}</p>}
           </div>
-          
+
           <div>
             <Label htmlFor="author">Author</Label>
             <Input id="author" name="author" placeholder="Author's name" required defaultValue={post.author} className="mt-1"/>
@@ -185,7 +179,7 @@ export default function EditPostPage({ params: paramsAsProp }: EditPostPageProps
             <Input id="tags" name="tags" placeholder="e.g., nextjs, react, webdev" defaultValue={post.tags?.join(', ') || ''} className="mt-1"/>
             {state.errors?.tags && <p className="text-sm text-red-500 mt-1">{state.errors.tags[0]}</p>}
           </div>
-          
+
           <div>
             <Label htmlFor="excerpt">Excerpt (Short Summary)</Label>
             <Input id="excerpt" name="excerpt" placeholder="A brief summary of the post..." required defaultValue={post.excerpt} className="mt-1"/>
@@ -219,7 +213,7 @@ export default function EditPostPage({ params: paramsAsProp }: EditPostPageProps
             <Label htmlFor="contentEditor">Content</Label>
             <div className="mt-1">
               <RichTextEditor
-                value={editorContent} // Pass the initial content here
+                value={editorContent}
                 onEditorChange={handleEditorChange}
                 placeholder="Continue editing your blog post..."
               />

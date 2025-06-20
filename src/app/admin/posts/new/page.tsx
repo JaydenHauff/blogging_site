@@ -17,7 +17,7 @@ import { Terminal } from 'lucide-react';
 import Image from 'next/image';
 import { Skeleton } from '@/components/ui/skeleton';
 
-const RichTextEditor = dynamic(() => import('@/components/forms/rich-text-editor'), { 
+const RichTextEditor = dynamic(() => import('@/components/forms/rich-text-editor').then(mod => mod.default), {
   ssr: false,
   loading: () => (
     <div className="space-y-2">
@@ -59,11 +59,9 @@ export default function CreatePostPage() {
         setImagePreviewUrl(null);
         setImageDataUri(null);
         setImageUrlInput('');
-        setEditorContent(''); 
-        // Manually reset the RichTextEditor content if it's controlled.
-        // The 'value' prop change should handle this for the new editor.
+        setEditorContent('');
         if (state.newPostSlug) {
-          router.push('/admin/posts'); // Redirect to posts list
+          router.push('/admin/posts');
         }
       }
     }
@@ -77,7 +75,7 @@ export default function CreatePostPage() {
         const dataUri = reader.result as string;
         setImagePreviewUrl(dataUri);
         setImageDataUri(dataUri);
-        setImageUrlInput(''); 
+        setImageUrlInput('');
       };
       reader.readAsDataURL(file);
     } else {
@@ -91,16 +89,14 @@ export default function CreatePostPage() {
     setImageUrlInput(url);
     if (url) {
       setImagePreviewUrl(url);
-      setImageDataUri(null); 
+      setImageDataUri(null);
       const fileInput = document.getElementById('imageFile') as HTMLInputElement;
-      if (fileInput) fileInput.value = ''; 
-    } else if (!imageDataUri) { 
+      if (fileInput) fileInput.value = '';
+    } else if (!imageDataUri) {
       setImagePreviewUrl(null);
     }
   };
 
-  // useCallback ensures this function's identity is stable across re-renders
-  // unless its dependencies change, which is good practice for props passed to children.
   const handleEditorChange = useCallback((content: string) => {
     setEditorContent(content);
   }, []);
@@ -134,7 +130,7 @@ export default function CreatePostPage() {
             <p className="text-xs text-muted-foreground mt-1">Should be unique, URL-friendly (lowercase, hyphens for spaces).</p>
             {state.errors?.slug && <p className="text-sm text-red-500 mt-1">{state.errors.slug[0]}</p>}
           </div>
-          
+
           <div>
             <Label htmlFor="author">Author</Label>
             <Input id="author" name="author" placeholder="Author's name" required className="mt-1"/>
@@ -152,7 +148,7 @@ export default function CreatePostPage() {
             <Input id="tags" name="tags" placeholder="e.g., nextjs, react, webdev" className="mt-1"/>
             {state.errors?.tags && <p className="text-sm text-red-500 mt-1">{state.errors.tags[0]}</p>}
           </div>
-          
+
           <div>
             <Label htmlFor="excerpt">Excerpt (Short Summary)</Label>
             <Input id="excerpt" name="excerpt" placeholder="A brief summary of the post..." required className="mt-1"/>
